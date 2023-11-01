@@ -4,6 +4,8 @@ export interface IUser extends Document {
   email: string;
   password?: string;
   fullname: string;
+  bvn?: string; 
+  phoneNumber?: string;
   ssoId?: string;
   ssoProvider?: string;
   verifiedEmail: boolean;
@@ -22,6 +24,8 @@ const UserSchema: Schema = new Schema(
     },
     password: { type: String, required: false },
     fullname: { type: String, required: true },
+    bvn: { type: String, required: false },
+    phoneNumber: { type: String, required: false },
     ssoId: { type: String, required: false },
     ssoProvider: {type: String},
     verifiedEmail: {type: Boolean, default: false},
