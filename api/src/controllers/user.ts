@@ -4,6 +4,11 @@ import { generateToken } from '../utils/utils';
 import dev from '../utils/logs';
 import Bcrypt from 'bcryptjs';
 
+
+
+
+
+
 export async function login(req: Request, res: Response) {
   try {
     if (req.url.startsWith('/google/redirect?code=')) {
@@ -24,6 +29,52 @@ export async function login(req: Request, res: Response) {
 }
 
 // manual signup goes here
+
+export async function signup(req: Request, res:Response) {
+  try {
+    const {fullname, email, phoneNumber, bvn, password} = req.body;
+    const salt = 10
+   
+    if(!fullname || !email || !phoneNumber || !bvn|| !password) {
+      return res.status(400).send('All fields are required');
+    }
+
+    const existingUser = await User.findOne({email});
+    
+    if(existingUser) {
+      return res.status(409).send('User already exists');
+    }
+
+    const hashedPassword = await Bcrypt.hash(password, salt);
+    const hashedBvn = await Bcrypt.hash(bvn, salt);
+
+    const user = await User.create({
+      fullname,
+      email,
+      phoneNumber,
+      bvn: hashedBvn,
+      password: hashedPassword,
+    });
+
+    const token = generateToken(user, res);
+    res.json({
+      message: 'User created successfully',
+      data: user,
+      token,
+    })
+
+    
+
+
+
+
+
+    
+  }
+  catch (error: any) {
+    return res.status(500).send('Internal server error');
+  }
+}
 
 // update user transaction pin
 export async function createPin(req: Request, res: Response) {
