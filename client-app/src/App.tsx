@@ -1,6 +1,8 @@
 import "./App.css";
 
 function App() {
+  const apiBaseUrl = 'http://localhost:5500';
+
   return (
     <>
       <h2 className="text-center py-5">
@@ -16,6 +18,14 @@ function App() {
           target="_blank"
         >
           Learn bootstrap
+        </a>
+      </div>
+      <div className="text-center">
+        <a
+          className="btn btn-primary"
+          href={`${apiBaseUrl}/auth/google`}
+        >
+          continue with google
         </a>
       </div>
     </>

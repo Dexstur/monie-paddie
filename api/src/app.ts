@@ -4,18 +4,41 @@ import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
+import session from 'express-session';
 
 import indexRouter from './routes/index';
 import usersRouter from './routes/users';
+import authRouter from './routes/auth';
 import dev from './utils/logs';
+import passportSetup from './config/passport';
+import cors from "cors";
 
 config();
+passportSetup()
 const app = express();
 const nodeEnv = process.env.NODE_ENV || 'development';
 dev.log(nodeEnv);
 
+const clientUrl = process.env.NODE_ENV === "development"? process.env.CLIENT_URL_DEV : process.env.CLIENT_URL;
+
+app.use(
+  cors({
+    origin: clientUrl,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
+app.use(
+  session({
+    secret: process.env.COOKIE_KEY as string,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
 
 if (nodeEnv === 'development') {
@@ -24,10 +47,11 @@ if (nodeEnv === 'development') {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/auth', authRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req: Request, res: Response, next: NextFunction) {
