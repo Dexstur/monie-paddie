@@ -1,4 +1,5 @@
 import express from 'express';
+import { createPin } from '../controllers/user';
 const router = express.Router();
 
 /* GET users listing. */
@@ -8,5 +9,7 @@ router.get('/', function (req, res, next) {
     data: '',
   });
 });
+
+router.put('/:id', createPin) 
 
 export default router;

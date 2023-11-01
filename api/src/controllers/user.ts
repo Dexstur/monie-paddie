@@ -1,25 +1,60 @@
 import User from '../models/user';
-import { Request, Response } from 'express';
-import { generateToken } from "../utils/utils";
+import e, { Request, Response } from 'express';
+import { generateToken } from '../utils/utils';
 import dev from '../utils/logs';
-
-
+import Bcrypt from 'bcryptjs';
 
 export async function login(req: Request, res: Response) {
   try {
-    if (req.url.startsWith("/google/redirect?code=")) {
+    if (req.url.startsWith('/google/redirect?code=')) {
       // res.send('you reached the callback URI'); return;
       // login with google
-      dev.log(req.user)
+      dev.log(req.user);
       const token = generateToken(req.user, res);
-      const clientUrl = process.env.NODE_ENV === "development"? process.env.CLIENT_URL_DEV : process.env.CLIENT_URL;
+      const clientUrl =
+        process.env.NODE_ENV === 'development'
+          ? process.env.CLIENT_URL_DEV
+          : process.env.CLIENT_URL;
       return res.redirect(`${clientUrl}/sso?token=${token}`);
     }
     // manual login goes here
-
   } catch (error: any) {
-    return res.status(500).send("Internal server error");
+    return res.status(500).send('Internal server error');
   }
 }
 
 // manual signup goes here
+
+// update user transaction pin
+export async function createPin(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    let { transactionPin, pinConfirmation } = req.body;
+
+    transactionPin = transactionPin.toString();
+    pinConfirmation = pinConfirmation.toString();
+
+    if (transactionPin.length !== 4 || !/^\d+$/.test(transactionPin)) {
+      return res.status(400).send('Invalid transaction pin');
+    }
+
+    if (transactionPin !== pinConfirmation) {
+      return res.status(400).send('Password confirmation does not match');
+    }
+
+    const salt = await Bcrypt.genSalt(10);
+    const hashedPin = await Bcrypt.hash(transactionPin, salt);
+
+    const user = await User.findByIdAndUpdate(
+      id,
+      { transactionPin: hashedPin, transactionPinSet: true },
+      { new: true },
+    );
+    return res.status(200).json({
+      message: 'User updated successfully',
+      data: user,
+    });
+  } catch (error: any) {
+    return res.status(500).send('Internal server error');
+  }
+}
