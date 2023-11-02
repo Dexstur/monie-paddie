@@ -1,34 +1,20 @@
 import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import MockPage from "./pages/mockpage/mockpage";
+import SignUpPage from "./pages/signup/Signup";
+import LoginPage from "./pages/login/Login";
 
 function App() {
-  const apiBaseUrl = 'http://localhost:5500';
+  // const apiBaseUrl = "http://localhost:5500";
 
   return (
-    <>
-      <h2 className="text-center py-5">
-        We would be using bootstrap for this project
-      </h2>
-      <p className="text-center">
-        Bootstrap makes certain aspects of css easy.
-      </p>
-      <div className="text-center">
-        <a
-          className="btn btn-primary"
-          href="https://getbootstrap.com/docs/5.3/getting-started/introduction/"
-          target="_blank"
-        >
-          Learn bootstrap
-        </a>
-      </div>
-      <div className="text-center">
-        <a
-          className="btn btn-primary"
-          href={`${apiBaseUrl}/auth/google`}
-        >
-          continue with google
-        </a>
-      </div>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MockPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
