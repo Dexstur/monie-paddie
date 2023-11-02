@@ -33,7 +33,7 @@ function MockPage() {
             Signup Page
           </a>
           <a
-            href="/signup"
+            href="/login"
             className="btn btn-primary mx-2 my-3 d-block d-sm-inline"
           >
             Login Page
