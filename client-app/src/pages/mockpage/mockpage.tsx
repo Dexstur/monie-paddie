@@ -1,5 +1,4 @@
 function MockPage() {
-  const apiBaseUrl = "http://localhost:5500";
   return (
     <div>
       <>
@@ -16,12 +15,6 @@ function MockPage() {
             target="_blank"
           >
             Learn bootstrap
-          </a>
-        </div>
-
-        <div className="text-center">
-          <a className="btn btn-primary" href={`${apiBaseUrl}/auth/google`}>
-            continue with google
           </a>
         </div>
         <br />

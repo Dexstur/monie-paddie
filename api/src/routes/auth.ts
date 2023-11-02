@@ -8,10 +8,7 @@ const router = express.Router();
 
 router.post("/login", user.login);
 
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email", "openid"] })
-);
+router.get("/google",passport.authenticate("google", { scope: ["profile", "email", "openid"] }));
 router.get("/google/redirect", passport.authenticate("google"), user.login);
 
 export default router;
