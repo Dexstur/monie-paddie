@@ -34,7 +34,7 @@ function LoginPage() {
               Enter your details to access your account
             </p>
           </RegisterBox>
-          <GoogleSignin href="#">
+          <GoogleSignin href={`http://localhost:5500/auth/google`}>
             <GooglesLogo src={googleLogo} alt="google logo" />
             Sign up with Google
           </GoogleSignin>

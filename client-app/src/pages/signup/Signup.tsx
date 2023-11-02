@@ -35,7 +35,7 @@ function SignUpPage() {
               Create an account to enjoy our benefits
             </p>
           </RegisterBox>
-          <GoogleSignin href="#">
+          <GoogleSignin href={`http://localhost:5500/auth/google`}>
             <GooglesLogo src={googleLogo} alt="google logo" />
             Sign up with Google
           </GoogleSignin>
