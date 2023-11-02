@@ -1,4 +1,5 @@
 import express from 'express';
+import { createPin,signup } from '../controllers/user';
 const router = express.Router();
 
 /* GET users listing. */
@@ -8,5 +9,8 @@ router.get('/', function (req, res, next) {
     data: '',
   });
 });
+
+router.put('/:id', createPin ) 
+router.post('/signup', signup)
 
 export default router;

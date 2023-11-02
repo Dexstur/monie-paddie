@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "engines": {
-    "node": "18"
+    "node": ">=18"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
