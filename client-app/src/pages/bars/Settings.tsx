@@ -1,7 +1,10 @@
 
+
 function Settings() {
   return (
-    <div>Settings</div>
+    <div className="settings">
+      <h1>Settings</h1>
+    </div>
   )
 }
 

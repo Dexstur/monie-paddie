@@ -3,9 +3,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MockPage from "./pages/mockpage/mockpage";
 import SignUpPage from "./pages/signup/Signup";
 import LoginPage from "./pages/login/Login";
-import Bars from "./pages/bars/Bars";
 import MockDashboard from "./pages/dummy-dashboard/Dashboard";
 import Sso from "./pages/sso/Sso";
+import SideBar from "./components/SideBar";
+import Home from "./pages/bars/Home";
+import Payment from "./pages/bars/Payment";
+import Settings from "./pages/bars/Settings";   
 
 function App() {
   return (
@@ -14,9 +17,12 @@ function App() {
         <Route path="/" element={<MockPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/bars" element={<Bars />} />
         <Route path="/dashboard" element={<MockDashboard />} />
-        <Route path="/sso" element={<Sso />} />
+        <Route path="/sso" element={<Sso />} /> 
+        <Route path="/sidebar" element={<SideBar />} />
+        <Route path="/sidebar/home" element={<Home />} />
+        <Route path="/sidebar/payment" element={<Payment />} />        
+        <Route path="/sidebar/settings" element={<Settings />} />
       </Routes>
     </BrowserRouter>
   );
