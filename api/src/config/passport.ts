@@ -24,8 +24,8 @@ export default function passportSetup() {
           // extract info from google profile
           const { sub, name, email } = profile._json;
 
-          // check if user already exists in our db with the given profile ID
-          let user = await User.findOne({ ssoId: sub });
+          // check if user already exists in our db with the given email
+          let user = await User.findOne({ email });
           if (user) {
             return done(null, user);
           }

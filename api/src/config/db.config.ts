@@ -2,7 +2,7 @@ import { config } from 'dotenv';
 import mongoose from 'mongoose';
 
 config();
- const without_internet = false; 
+const without_internet = false;
 
 const URI = process.env.MONGO_URI || '';
 const password = process.env.MONGO_PASSWORD || '';

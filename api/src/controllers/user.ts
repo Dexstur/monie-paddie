@@ -1,16 +1,15 @@
 import User from '../models/user';
-import e, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { generateToken } from '../utils/utils';
-import { signupSchema, loginSchema, options } from '../utils/validation'
+// import { signupSchema, loginSchema, options } from '../utils/validation'
 import dev from '../utils/logs';
 import Bcrypt from 'bcryptjs';
 
 
-
 export async function login(req: Request, res: Response) {
   try {
+
     if (req.url.startsWith('/google/redirect?code=')) {
-      // res.send('you reached the callback URI'); return;
       // login with google
 
       dev.log(req.user);
@@ -65,18 +64,17 @@ export async function login(req: Request, res: Response) {
 }
 
 // manual signup goes here
-
 export async function signup(req: Request, res:Response) {
   try {
     const {fullname, email, phoneNumber, bvn, password} = req.body;
     const salt = 10
-   
+
     if(!fullname || !email || !phoneNumber || !bvn|| !password) {
       return res.status(400).send('All fields are required');
     }
 
     const existingUser = await User.findOne({email});
-    
+
     if(existingUser) {
       return res.status(409).send('User already exists');
     }
@@ -98,7 +96,7 @@ export async function signup(req: Request, res:Response) {
       data: user,
       token,
     })
-  
+
   }
   catch (error: any) {
     return res.status(500).send('Internal server error');
