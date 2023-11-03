@@ -26,7 +26,7 @@ function LoginPage() {
   return (
     <Wrapper>
       <div className="row">
-        <SignupSide className="col col-12 col-lg-5">
+        <SignupSide className="col col-12 col-lg-5">   
           <StylishText>Monie Paddy</StylishText>
           <RegisterBox className="my-4">
             <h2 style={{ fontSize: "32px" }}>Log In</h2>
