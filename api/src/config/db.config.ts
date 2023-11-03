@@ -10,7 +10,7 @@ let connectionString = URI.replace('<password>', password);
 
 async function connectDB() {
   try {
-    if (without_internet) connectionString = process.env.MONGO_URI_OFFLINE as string;
+     if (without_internet) connectionString = process.env.MONGO_URI_OFFLINE as string;
     await mongoose.connect(connectionString);
     console.log(`Db connected`);
   } catch (err) {

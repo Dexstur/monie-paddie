@@ -1,6 +1,8 @@
 import User from '../models/user';
 import { Request, Response } from 'express';
 import { generateToken } from '../utils/utils';
+// import { signupSchema, loginSchema, options } from '../utils/validation'
+import dev from '../utils/logs';
 import Bcrypt from 'bcryptjs';
 
 
@@ -9,6 +11,8 @@ export async function login(req: Request, res: Response) {
 
     if (req.url.startsWith('/google/redirect?code=')) {
       // login with google
+
+      dev.log(req.user);
       const token = generateToken(req.user, res);
       const clientUrl =
         process.env.NODE_ENV === 'development'
@@ -17,13 +21,49 @@ export async function login(req: Request, res: Response) {
       return res.redirect(`${clientUrl}/sso?token=${token}`);
     }
     // manual login goes here
+
+      // Validate user inputs
+      // const validate = loginSchema.validate(req.body, options);
+      // if (validate.error) {
+      //   const message = validate.error.details.map((detail) => detail.message).join(',');
+      //   return res.status(400).json({ 
+      //     status: 'fail',
+      //     message,
+      //   });
+      // }
+
+    const { email, password} = req.body
+
+    // Check if user exists
+    const user = await User.findOne({ email});
+    if (!user) {
+      return res.status(404).send('No user found')
+    }
+    if (!user.password) {
+      return res.status(403).send('Invalid login route. Use SSO');
+    }
+
+    // Check if the password is correct and log in user
+    const validUser = Bcrypt.compareSync(password, user.password)
+    if (!validUser){
+      return res.status(404).send('invalid login details')
+    }
+    
+    // Generate token and set a cookie with the token 
+    const token = generateToken(user, res);
+
+    return res.status(200).json({
+      message: 'User Login successful',
+      data: user,
+      token,
+    })
+
   } catch (error: any) {
     return res.status(500).send('Internal server error');
   }
 }
 
 // manual signup goes here
-
 export async function signup(req: Request, res:Response) {
   try {
     const {fullname, email, phoneNumber, bvn, password} = req.body;
@@ -56,13 +96,6 @@ export async function signup(req: Request, res:Response) {
       data: user,
       token,
     })
-
-
-
-
-
-
-
 
   }
   catch (error: any) {
