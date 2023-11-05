@@ -13,6 +13,7 @@
 body {
   width: 100%;
   max-width: 1680px;
+  font-family: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -27,7 +28,7 @@ input[type="number"] {
 
 .home,
 .payments,
-.settings{
+.settings {
   display: flex;
   margin-left: 260px;
   font-size: 2rem;

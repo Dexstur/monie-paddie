@@ -95,6 +95,8 @@ export const InputField = styled.input`
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 8px;
+  background-color: #fff;
+  color: #000;
 
   &:focus {
     outline: none;
