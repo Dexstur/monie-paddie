@@ -10,7 +10,6 @@ router.get('/', function (req, res, next) {
   });
 });
 
-router.put('/:id', createPin ) 
-
+router.put('/:id', createPin);
 
 export default router;

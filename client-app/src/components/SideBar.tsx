@@ -1,67 +1,66 @@
 import styled from "styled-components";
-import { StylishText } from "../pages/signup/Signup.style";
-import { IconContext } from "react-icons/lib";
-import { BsBellFill } from "react-icons/bs";
-import { SidebarData } from "./SidebarData";
-import pic3 from "../assets/pic3.jpg";
-import { NavLink } from "react-router-dom";
+import { AiTwotoneHome, AiFillSetting } from "react-icons/ai";
+import { BsStack } from "react-icons/bs";
 
-const TopBar = styled.nav`
-  width: 100%;
-  height: 100px;
+const Wrapper = styled.div<{ show: boolean }>`
+  width: 180px;
+  height: 100vh;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: ${({ show }) => (show ? "block" : "none")};
+  background-color: #fff;
+  padding-top: 68px;
+
+  @media (min-width: 768px) {
+    display: block;
+    width: 240px;
+  }
+`;
+
+const NavWrap = styled.div`
+  width: 80%;
+  margin: 40px auto;
   display: flex;
-  justify-content: space-between;
-  padding: 55px 40px 40px 40px;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const NavItem = styled.div<{ active: boolean }>`
+  text-decoration: none;
+  display: flex;
+  padding: 8px 12px;
+  width: 100%;
+  cursor: pointer;
+  background-color: ${({ active }) => (active ? "#e3f1fe" : "#fff")};
+  color: ${({ active }) => (active ? "#00afb9" : "#727372")};
+  gap: 16px;
   align-items: center;
 `;
 
-const SidebarNav = styled.nav`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  align-items: flex-start;
-  justify-content: flex-start;
-  position: absolute;
-  left: 16px;
-  top: 144px;
-`;
+interface SidebarProps {
+  show: boolean;
+  activeNav?: "home" | "payment" | "settings";
+}
 
-const SidebarWrap = styled.div`
-  width: 100%;
-`;
-
-const ProfilePic = styled.img`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-`;
-
-function SideBar() {
-
+function SideBar({ show, activeNav = "home" }: SidebarProps) {
   return (
-    <>
-      <IconContext.Provider value={{ color: "#fff" }}>
-        <TopBar>
-          <StylishText>Monie Paddy</StylishText>
-          <div><p>Home</p></div>
-          <div>
-            <BsBellFill size={24} color={"black"}/>
-            <ProfilePic src={pic3} alt="profile picture" />
-          </div>
-        </TopBar>
-        <SidebarNav>
-          <SidebarWrap>
-            {SidebarData.map((item, index) => (
-              <NavLink to={item.path} key={index} className="link">
-                <div className="icon">{item.icon}</div>
-                <div className="text">{item.title}</div>
-              </NavLink>
-            ))}
-          </SidebarWrap>
-        </SidebarNav>
-      </IconContext.Provider>
-    </>
+    <Wrapper show={show} className="sidebar">
+      <NavWrap>
+        <NavItem active={activeNav === "home"}>
+          <AiTwotoneHome size={24} />
+          <span>Home</span>
+        </NavItem>
+        <NavItem active={activeNav === "payment"}>
+          <BsStack size={24} />
+          <span>Payment</span>
+        </NavItem>
+        <NavItem active={activeNav === "settings"}>
+          <AiFillSetting size={24} />
+          <span>Settings</span>
+        </NavItem>
+      </NavWrap>
+    </Wrapper>
   );
 }
 

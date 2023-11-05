@@ -31,6 +31,12 @@ function MockPage() {
           >
             Login Page
           </a>
+          <a
+            href="/dashboard"
+            className="btn btn-primary mx-2 my-3 d-block d-sm-inline"
+          >
+            View Dashboard
+          </a>
         </div>
       </>
     </div>

@@ -16,17 +16,48 @@ import {
   ExtLink,
 } from "./Login.style";
 import googleLogo from "/google-logo.png";
-import { FormEvent } from "react";
+import { FormEvent, useState, ChangeEvent } from "react";
+import Api from "../../api.config";
 
 function LoginPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    console.log("Form submitted");
+    if (!submitting) {
+      setSubmitting(true);
+      console.log("submitting form");
+      Api.post("/auth/login", loginData)
+        .then((res) => {
+          console.log(res.data);
+          const { message } = res.data;
+          console.log(message);
+          console.log("login successful");
+          setLoginData({ email: "", password: "" });
+          setSubmitting(false);
+        })
+        .catch((err) => {
+          if (err.response) {
+            const errorCode = err.response.status;
+            console.error(`Problem occured received status: ${errorCode}`);
+          } else {
+            console.error("Did not receive response");
+          }
+          console.log("login failed");
+          setLoginData({ email: "", password: "" });
+          setSubmitting(false);
+        });
+    }
+  }
+
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [submitting, setSubmitting] = useState(false);
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setLoginData({ ...loginData, [name]: value });
   }
   return (
     <Wrapper>
       <div className="row">
-        <SignupSide className="col col-12 col-lg-5">   
+        <SignupSide className="col col-12 col-lg-5">
           <StylishText>Monie Paddy</StylishText>
           <RegisterBox className="my-4">
             <h2 style={{ fontSize: "32px" }}>Log In</h2>
@@ -52,6 +83,9 @@ function LoginPage() {
                 id="email"
                 placeholder="name@example.com"
                 type="email"
+                name="email"
+                value={loginData.email}
+                onChange={handleChange}
                 required
               />
             </div>
@@ -63,11 +97,15 @@ function LoginPage() {
                 id="password"
                 placeholder="Password123@"
                 type="password"
+                name="password"
+                minLength={6}
+                value={loginData.password}
+                onChange={handleChange}
                 required
               />
             </div>
             <div className="mt-5">
-              <SubmitForm type="submit">Sign Up</SubmitForm>
+              <SubmitForm type="submit">Sign In</SubmitForm>
             </div>
           </form>
           <div className="d-flex" style={{ gap: "8px" }}>

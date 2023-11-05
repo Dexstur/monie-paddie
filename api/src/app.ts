@@ -11,22 +11,25 @@ import usersRouter from './routes/users';
 import authRouter from './routes/auth';
 import dev from './utils/logs';
 import passportSetup from './config/passport';
-import cors from "cors";
+import cors from 'cors';
 
 config();
-passportSetup()
+passportSetup();
 const app = express();
 const nodeEnv = process.env.NODE_ENV || 'development';
 dev.log(nodeEnv);
 
-const clientUrl = process.env.NODE_ENV === "development"? process.env.CLIENT_URL_DEV : process.env.CLIENT_URL;
+const clientUrl =
+  process.env.NODE_ENV === 'development'
+    ? process.env.CLIENT_URL_DEV
+    : process.env.CLIENT_URL;
 
 app.use(
   cors({
     origin: clientUrl,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
-  })
+  }),
 );
 
 app.use(
@@ -34,7 +37,7 @@ app.use(
     secret: process.env.COOKIE_KEY as string,
     resave: false,
     saveUninitialized: false,
-  })
+  }),
 );
 
 // view engine setup
@@ -51,7 +54,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/auth', authRouter)
+app.use('/auth', authRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req: Request, res: Response, next: NextFunction) {

@@ -22,7 +22,7 @@ body {
 }
 
 .special-text {
-  color: var(--Pri-Color);
+  color: var(--Pri-Color, #00afb9);
 }
 
 @media (prefers-color-scheme: light) {
