@@ -13,10 +13,6 @@ router.get(
   passport.authenticate('google', { scope: ['profile', 'email', 'openid'] }),
 );
 router.get('/google/redirect', passport.authenticate('google'), user.login);
-router.get('/login', (req, res) => {
-  res.json({
-    message: 'Hey there',
-  });
-});
+router.post('/google/redirect', user.googleSignOn);
 
 export default router;

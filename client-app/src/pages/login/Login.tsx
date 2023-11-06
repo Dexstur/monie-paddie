@@ -17,9 +17,13 @@ import {
 } from "./Login.style";
 import googleLogo from "/google-logo.png";
 import { FormEvent, useState, ChangeEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import Api from "../../api.config";
+import axios from "axios";
+import { useGoogleLogin } from "@react-oauth/google";
 
 function LoginPage() {
+  const navigate = useNavigate();
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!submitting) {
@@ -27,12 +31,12 @@ function LoginPage() {
       console.log("submitting form");
       Api.post("/auth/login", loginData)
         .then((res) => {
-          console.log(res.data);
           const { message } = res.data;
           console.log(message);
           console.log("login successful");
           setLoginData({ email: "", password: "" });
           setSubmitting(false);
+          navigate("/dashboard");
         })
         .catch((err) => {
           if (err.response) {
@@ -45,6 +49,57 @@ function LoginPage() {
           setLoginData({ email: "", password: "" });
           setSubmitting(false);
         });
+    }
+  }
+
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse: { access_token: string }) => {
+      axios
+        .get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${codeResponse.access_token}`,
+          {
+            headers: {
+              Accept: "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          Api.post(`/auth/google/redirect`, res.data)
+            .then((response) => {
+              const { message } = response.data;
+              // localStorage.setItem("blogtoken", token);
+              navigate("/dashboard");
+              console.log(message);
+              setSubmitting(false);
+            })
+            .catch((err) => {
+              if (err.response) {
+                const errorCode = err.response.status;
+                console.log(`auth failed with status code: ${errorCode}`);
+              } else {
+                console.log(err);
+              }
+              setSubmitting(false);
+              // navigate("/users/signup");
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+          console.error("Setup failed: backend response");
+          setSubmitting(false);
+          // navigate("/users/signup");
+        });
+    },
+    onError: (error) => {
+      console.log("Login Failed: Bad Setup", error);
+      // navigate("/");
+      setSubmitting(false);
+    },
+  });
+  function googlePassport() {
+    if (!submitting) {
+      setSubmitting(true);
+      login();
     }
   }
 
@@ -65,9 +120,9 @@ function LoginPage() {
               Enter your details to access your account
             </p>
           </RegisterBox>
-          <GoogleSignin href={`http://localhost:5500/auth/google`}>
+          <GoogleSignin href={`#`} onClick={() => googlePassport()}>
             <GooglesLogo src={googleLogo} alt="google logo" />
-            Sign up with Google
+            Sign in with Google
           </GoogleSignin>
           <Strikethrough className="my-4">
             <Strike />
