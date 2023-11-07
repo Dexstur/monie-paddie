@@ -18,6 +18,7 @@ const Content = styled.div`
   background-color: #e3f1fe;
   min-height: 100vh;
   padding: 88px 20px 24px 20px;
+  position: relative;
 
   @media (min-width: 768px) {
     padding: 88px 20px 24px 260px;
