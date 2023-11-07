@@ -66,9 +66,13 @@ function LoginPage() {
         .then((res) => {
           Api.post(`/auth/google/redirect`, res.data)
             .then((response) => {
-              const { message } = response.data;
-              // localStorage.setItem("blogtoken", token);
-              navigate("/dashboard");
+              const { message, registered } = response.data;
+              console.log(registered);
+              if (registered) {
+                navigate("/dashboard");
+              } else {
+                navigate("/register");
+              }
               console.log(message);
               setSubmitting(false);
             })
