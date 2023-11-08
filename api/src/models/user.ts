@@ -12,6 +12,7 @@ export interface IUser extends Document {
   verifiedEmail: boolean;
   transactionPinSet?: boolean;
   transactionPin?: string;
+  balance: number;
 }
 
 const UserSchema: Schema = new Schema(
@@ -38,6 +39,7 @@ const UserSchema: Schema = new Schema(
       length: 4,
       default: '0000',
     },
+    balance: { type: Number, default: 0 },
   },
   { timestamps: true },
 );
