@@ -17,9 +17,67 @@ import {
 } from "./Signup.style";
 import googleLogo from "/google-logo.png";
 import { FormEvent } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
+import Api from "../../api.config";
 // import { InputFieldWeb } from "./InputFieldWeb";
 
 function SignUpPage() {
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse: { access_token: string }) => {
+      axios
+        .get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${codeResponse.access_token}`,
+          {
+            headers: {
+              Accept: "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          Api.post(`/auth/google/redirect`, res.data)
+            .then((response) => {
+              const { message } = response.data;
+              navigate("/dashboard");
+              console.log(message);
+              setSubmitting(false);
+            })
+            .catch((err) => {
+              if (err.response) {
+                const errorCode = err.response.status;
+                console.log(`auth failed with status code: ${errorCode}`);
+              } else {
+                console.log(err);
+              }
+              setSubmitting(false);
+              // navigate("/users/signup");
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+          console.error("Setup failed: backend response");
+          setSubmitting(false);
+          // navigate("/users/signup");
+        });
+    },
+    onError: (error) => {
+      console.log("Login Failed: Bad Setup", error);
+      // navigate("/");
+      setSubmitting(false);
+    },
+  });
+
+  function googlePassport() {
+    if (!submitting) {
+      setSubmitting(true);
+      login();
+    }
+  }
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     console.log("Form submitted");
@@ -35,7 +93,7 @@ function SignUpPage() {
               Create an account to enjoy our benefits
             </p>
           </RegisterBox>
-          <GoogleSignin href={`http://localhost:5500/auth/google`}>
+          <GoogleSignin href={`#`} onClick={googlePassport}>
             <GooglesLogo src={googleLogo} alt="google logo" />
             Sign up with Google
           </GoogleSignin>
