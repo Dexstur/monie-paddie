@@ -1,24 +1,28 @@
 import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import MockPage from "./pages/mockpage/mockpage";
+import SignUpPage from "./pages/signup/Signup";
+import LoginPage from "./pages/login/Login";
+import MockDashboard from "./pages/dummy-dashboard/Dashboard";
+import Register from "./pages/register/Register";
+import Home from "./pages/bars/Home";
+import Payment from "./pages/bars/Payment";
+import Settings from "./pages/bars/Settings";
 
 function App() {
   return (
-    <>
-      <h2 className="text-center py-5">
-        We would be using bootstrap for this project
-      </h2>
-      <p className="text-center">
-        Bootstrap makes certain aspects of css easy.
-      </p>
-      <div className="text-center">
-        <a
-          className="btn btn-primary"
-          href="https://getbootstrap.com/docs/5.3/getting-started/introduction/"
-          target="_blank"
-        >
-          Learn bootstrap
-        </a>
-      </div>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MockPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/dashboard" element={<MockDashboard />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/sidebar/home" element={<Home />} />
+        <Route path="/sidebar/payment" element={<Payment />} />
+        <Route path="/sidebar/settings" element={<Settings />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
