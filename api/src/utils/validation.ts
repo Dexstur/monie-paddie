@@ -19,6 +19,14 @@ export const loginSchema = Joi.object({
     .required(),
 });
 
+//airtime validation
+export const airtimeValidator = Joi.object().keys({
+  amount: Joi.number().required().min(1),
+  phoneNumber: Joi.string().required(),
+  network: Joi.string().required(),
+  transactionPin: Joi.string().required()
+})
+
 export const options = {
   abortEarly:false,
   errors:{
