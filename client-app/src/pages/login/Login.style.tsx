@@ -16,7 +16,7 @@ export const SignupSide = styled.div`
 `;
 
 export const FounderSide = styled.div`
-  background-color: #e3f1fe;
+  background-color: #e3f1ff;
 
   @media (min-width: 768px) {
     min-height: 100vh;
@@ -131,4 +131,12 @@ export const SubmitForm = styled.button`
 export const ExtLink = styled.a`
   text-decoration: none;
   color: var(--Pri-Color);
+`;
+
+export const Text = styled.h1`
+  font-family: "Holtwood One SC";
+  color: #000;
+  font-size: 19px;
+  font-weight: 250;
+  padding: 45px 25px;
 `;

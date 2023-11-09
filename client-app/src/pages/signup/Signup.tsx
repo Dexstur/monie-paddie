@@ -14,6 +14,7 @@ import {
   Label,
   SubmitForm,
   ExtLink,
+  Text,
 } from "./Signup.style";
 import googleLogo from "/google-logo.png";
 import { FormEvent, useState, ChangeEvent } from "react";
@@ -234,7 +235,13 @@ function SignUpPage() {
           </div>
         </SignupSide>
         <FounderSide className="col col-12 col-lg-7">
-          <p>Founder message here</p>
+          {/* <p>Founder message here</p> */}
+          <Text>
+            It takes 20 years to build a reputation and five minutes to ruin it.
+            If you think about that, you’ll do things differently.
+          </Text>
+          <strong className="py-7 px-4"> - Boluwatife</strong>
+          <p className="p-4"> Founder, Pay-buddy</p>
         </FounderSide>
       </div>
     </Wrapper>
