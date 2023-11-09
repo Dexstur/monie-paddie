@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import Transaction from "../models/transaction";
-import { airtimeValidator, validationOptions } from "../utils/validators";
+import { airtimeValidator, options } from "../utils/validation";
 import User from "../models/user";
 import Bcrypt from "bcryptjs";
 
 /**Server logic for buy airtime */
 export async function buyAirtime(req: Request, res: Response) {
   const userId = req.user;
-  const { error } = airtimeValidator.validate(req.body, validationOptions);
+  const { error } = airtimeValidator.validate(req.body, options);
   if (error) return res.status(400).json({ message: error.message });
 
   const user = await User.findById(userId);
