@@ -9,6 +9,7 @@ import session from 'express-session';
 import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 import authRouter from './routes/auth';
+import transactionsRouter from './routes/transactions';
 import dev from './utils/logs';
 import passportSetup from './config/passport';
 import cors from 'cors';
@@ -55,6 +56,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);
+app.use('/transactions', transactionsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req: Request, res: Response, next: NextFunction) {

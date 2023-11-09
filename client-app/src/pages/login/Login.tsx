@@ -23,35 +23,9 @@ import axios from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
 
 function LoginPage() {
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!submitting) {
-      setSubmitting(true);
-      console.log("submitting form");
-      Api.post("/auth/login", loginData)
-        .then((res) => {
-          const { message } = res.data;
-          console.log(message);
-          console.log("login successful");
-          setLoginData({ email: "", password: "" });
-          setSubmitting(false);
-          navigate("/dashboard");
-        })
-        .catch((err) => {
-          if (err.response) {
-            const errorCode = err.response.status;
-            console.error(`Problem occured received status: ${errorCode}`);
-          } else {
-            console.error("Did not receive response");
-          }
-          console.log("login failed");
-          setLoginData({ email: "", password: "" });
-          setSubmitting(false);
-        });
-    }
-  }
-
   const login = useGoogleLogin({
     onSuccess: (codeResponse: { access_token: string }) => {
       axios
@@ -100,6 +74,35 @@ function LoginPage() {
       setSubmitting(false);
     },
   });
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!submitting) {
+      setSubmitting(true);
+      console.log("submitting form");
+      Api.post("/auth/login", loginData)
+        .then((res) => {
+          const { message } = res.data;
+          console.log(message);
+          console.log("login successful");
+          setLoginData({ email: "", password: "" });
+          setSubmitting(false);
+          navigate("/dashboard");
+        })
+        .catch((err) => {
+          if (err.response) {
+            const errorCode = err.response.status;
+            console.error(`Problem occured received status: ${errorCode}`);
+          } else {
+            console.error("Did not receive response");
+          }
+          console.log("login failed");
+          setLoginData({ email: "", password: "" });
+          setSubmitting(false);
+        });
+    }
+  }
+
   function googlePassport() {
     if (!submitting) {
       setSubmitting(true);
@@ -107,12 +110,11 @@ function LoginPage() {
     }
   }
 
-  const [loginData, setLoginData] = useState({ email: "", password: "" });
-  const [submitting, setSubmitting] = useState(false);
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     setLoginData({ ...loginData, [name]: value });
   }
+
   return (
     <Wrapper>
       <div className="row">
@@ -124,7 +126,7 @@ function LoginPage() {
               Enter your details to access your account
             </p>
           </RegisterBox>
-          <GoogleSignin href={`#`} onClick={() => googlePassport()}>
+          <GoogleSignin href={`#`} onClick={googlePassport}>
             <GooglesLogo src={googleLogo} alt="google logo" />
             Sign in with Google
           </GoogleSignin>
