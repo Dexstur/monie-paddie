@@ -131,8 +131,8 @@ function Header({ toggleSidebar }: HeaderProps) {
         <SuccessModal 
           show={showModal} 
           handleClose={handleModalClose} 
-          title="Success" 
-          message="You have clicked the success button!" 
+          title="Congratulations Gift🥳" 
+          message="Your account has been created . Sign in to view your dashboard" 
           id="successModal"
         /> {/* the SuccessModal component */}
       </TopSection>
