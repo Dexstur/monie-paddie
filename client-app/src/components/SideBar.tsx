@@ -5,6 +5,7 @@ import { RxExit } from "react-icons/rx";
 import Api from "../api.config";
 import { useNavigate } from "react-router-dom";
 
+
 const Wrapper = styled.div<{ show: boolean }>`
   width: 180px;
   height: 100vh;
@@ -69,11 +70,15 @@ interface SidebarProps {
 
 function SideBar({ show, activeNav = "home" }: SidebarProps) {
   const navigate = useNavigate();
+ 
+
   function logout() {
     Api.post("/auth/logout").then(() => {
       navigate("/login");
     });
   }
+
+
   return (
     <Wrapper show={show} className="sidebar">
       <NavWrap>
@@ -94,7 +99,9 @@ function SideBar({ show, activeNav = "home" }: SidebarProps) {
           <RxExit size={24} />
           <span>Logout</span>
         </LogoutBtn>
+      
       </NavWrap>
+     
     </Wrapper>
   );
 }
