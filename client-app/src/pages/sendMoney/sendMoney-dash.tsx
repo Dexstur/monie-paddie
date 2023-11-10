@@ -9,7 +9,7 @@ import Sendmoney from "./Sendmoney";
 function Sendmoneydash() {
   const [data, setData] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const [popModal, setPopModal] = useState(false);
+  const [popModal, setPopModal] = useState(true);
 
   useEffect(() => {
     Api.get("/users/dashboard")

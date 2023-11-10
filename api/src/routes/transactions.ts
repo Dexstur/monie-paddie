@@ -5,6 +5,7 @@ import { auth } from '../middleware/auth';
 const router = express.Router();
 
 router.post('/airtime', auth, transaction.buyAirtime);
-router.get('/transactions/:userId', auth, transaction.getBalance);
+router.get('/balance', auth, transaction.getBalance);
+router.post('/fund', auth, transaction.fundWallet);
 
 export default router;

@@ -16,12 +16,13 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #e3f1fe;
-  min-height: 100vh;
-  padding: 88px 20px 24px 20px;
+  height: 100vh;
+  overflow-y: scroll;
+  padding: 68px 0px 0px 0px;
   position: relative;
 
   @media (min-width: 768px) {
-    padding: 88px 20px 24px 260px;
+    padding: 68px 0px 0px 240px;
   }
 `;
 
