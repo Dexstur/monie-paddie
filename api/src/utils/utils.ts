@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import Jwt from 'jsonwebtoken';
 import { IUser } from '../models/user';
+import Transaction from '../models/transaction';
 import { config } from 'dotenv';
 
 config();
@@ -39,4 +40,18 @@ export function verifyToken(token: string) {
   } catch (err) {
     return null;
   }
+}
+
+export async function calculateBalance(userId: string) {
+  const allTransactions = await Transaction.find({ userId });
+  let balance = 0;
+  if (allTransactions.length === 0) {
+    return balance;
+  }
+
+  allTransactions.forEach((entry) => {
+    entry.credit ? (balance += entry.amount) : (balance -= entry.amount);
+  });
+
+  return balance;
 }

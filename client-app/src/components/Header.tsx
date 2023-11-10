@@ -1,9 +1,7 @@
-import  { useState } from "react";
 import { styled } from "styled-components";
 import { HiBell } from "react-icons/hi";
 import { FaBars } from "react-icons/fa";
 import pic3 from "../assets/pic3.jpg";
-import SuccessModal from "./modals/successModal";
 
 const TopBar = styled.header`
   width: 100%;
@@ -87,18 +85,15 @@ const ProfilePic = styled.img`
   object-fit: cover;
 `;
 
-const SuccessButton = styled.button`
-  // Add your styles here
-`;
+// const SuccessButton = styled.button`
+//   // Add your styles here
+// `;
 
 interface HeaderProps {
   toggleSidebar: () => void;
 }
 
 function Header({ toggleSidebar }: HeaderProps) {
-  const [showModal, setShowModal] = useState(false); // state variable to control the modal
-
-  const handleModalClose = () => setShowModal(false); // function to close the modal
   return (
     <TopBar>
       <TopSection
@@ -121,20 +116,12 @@ function Header({ toggleSidebar }: HeaderProps) {
           textAlign: "right",
         }}
       >
-        <SuccessButton onClick={() => setShowModal(true)}>Success</SuccessButton> {/* the Success button */}
         <BellWrap className="mx-2">
           <HiBell size={24} color={"#00afb9"} />
         </BellWrap>
         <span className="mx-2">
           <ProfilePic src={pic3} alt="profile picture" />
         </span>
-        <SuccessModal 
-          show={showModal} 
-          handleClose={handleModalClose} 
-          title="Congratulations Gift🥳" 
-          message="Your account has been created . Sign in to view your dashboard" 
-          id="successModal"
-        /> {/* the SuccessModal component */}
       </TopSection>
     </TopBar>
   );
