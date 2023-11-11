@@ -8,6 +8,10 @@ import { OptionSide, TransactionSide, MoneyDetail } from "./Dashboard.style";
 import Balance from "./Balance";
 import Funding from "./Funding";
 import SuccessModal from "../../components/modals/successModal";
+import Mastercard from "../../assets/mastercard.png";
+import { CardDetails, UserDetails, Wrapper, Text } from "./CardDetails.style";
+import FrequentTransfers from "./FrequentTransactions.style";
+import Referrals from "./Referral.style";
 
 function MockDashboard() {
   const [data, setData] = useState(null);
@@ -76,16 +80,32 @@ function MockDashboard() {
             <MoneyDetail>
               <Balance balance={userBalance} />
               <div
+                className="col-lg-6 col-12"
                 style={{
                   height: "186px",
                   width: "312px",
                   backgroundColor: "#fff",
                 }}
-              ></div>
+              >
+                <img
+                  src={Mastercard}
+                  alt="credit card"
+                  className="mt-4 mx-4"
+                  style={{ width: "40px", height: "24px" }}
+                />
+                <UserDetails>GIFT CHUKS</UserDetails>
+                <CardDetails>***6580</CardDetails>
+              </div>
             </MoneyDetail>
             <div className="my-3" style={{ padding: "0 24px" }}>
               <Funding userEmail={userEmail} success={fundSuccess} />
             </div>
+            <Wrapper>
+              <Text>Quick Transfer</Text>
+              <FrequentTransfers />
+              <Text>Refer and earn 💰</Text>
+              <Referrals />
+            </Wrapper>
           </OptionSide>
           <TransactionSide className="col-12 col-lg-4"></TransactionSide>
         </div>
