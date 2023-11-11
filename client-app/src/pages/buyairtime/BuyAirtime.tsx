@@ -10,8 +10,6 @@ const Wrapper = styled.div<{ show: boolean }>`
   position: static;
   z-index: 400;
   margin: 0 auto;
-  
-  
 
   right: auto;
   display: ${({ show }) => (show ? "flex" : "none")};
@@ -172,8 +170,8 @@ function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
             required
           />
         </div>
-      <br></br>
-        <CreateBtn  type="submit">{buttonText}</CreateBtn>
+        <br></br>
+        <CreateBtn type="submit">{buttonText}</CreateBtn>
       </form>
       <Msg>{feedback}</Msg>
     </Wrapper>

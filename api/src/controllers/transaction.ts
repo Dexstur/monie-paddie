@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import { config } from 'dotenv';
 import Transaction from '../models/transaction';
-import { airtimeValidator, options } from '../utils/validation';
+import {
+  airtimeValidator,
+  options,
+  validBankTransfer,
+} from '../utils/validation';
 import User from '../models/user';
 import Bcrypt from 'bcryptjs';
 import { calculateBalance } from '../utils/utils';
@@ -30,12 +34,16 @@ export async function buyAirtime(req: Request, res: Response) {
     ) {
       return res.status(400).json({ message: 'Invalid transaction pin' });
     }
-    console.log(userBalance, amountInKobo)
+    console.log(userBalance, amountInKobo);
     if (userBalance < amountInKobo) {
       return res.status(400).json({ message: 'Insufficient balance' });
     }
     // call the airtime api (blochq)
-    const response = await buyAirtimeFromBloc(amountInKobo, phoneNumber, network);
+    const response = await buyAirtimeFromBloc(
+      amountInKobo,
+      phoneNumber,
+      network,
+    );
     const { status, reference } = response.data;
 
     // create a new transaction
@@ -47,7 +55,7 @@ export async function buyAirtime(req: Request, res: Response) {
       transactionType: 'airtime',
       credit: false,
       reference,
-      status
+      status,
     });
 
     await transaction.save();
@@ -64,7 +72,6 @@ export async function buyAirtime(req: Request, res: Response) {
       message: 'Your airtime purchase was successful',
       data: transaction,
     });
-
   } catch (error: any) {
     res
       .status(500)
@@ -161,6 +168,75 @@ export async function fundWallet(req: Request, res: Response) {
     return res.status(500).json({
       message: 'Internal server error',
       error: err,
+    });
+  }
+}
+
+export async function bankTransfer(req: Request, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: 'No token provided',
+        error: 'Unauthorised',
+      });
+    }
+
+    const user = await User.findById(req.user);
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'Cannot process transaction',
+        error: 'User not found',
+      });
+    }
+
+    const { error } = validBankTransfer.validate(req.body);
+    if (error) {
+      return res.status(400).json({
+        message: 'Transaction failed',
+        error: error.message,
+      });
+    }
+    const { amount, bankName, accountName, accountNumber, note, pin } =
+      req.body;
+
+    const validPin = Bcrypt.compareSync(pin, user.transactionPin);
+    if (!validPin) {
+      return res.status(403).json({
+        message: 'Transaction failed',
+        error: 'Invalid credentials',
+      });
+    }
+
+    const balance = await calculateBalance(req.user);
+
+    if (balance < amount) {
+      return res.status(409).json({
+        message: 'Transaction failed',
+        error: 'Insufficient funds',
+      });
+    }
+
+    const transfer = await Transaction.create({
+      userId: req.user,
+      amount,
+      accountName,
+      accountNumber,
+      bankName,
+      transactionType: 'transfer',
+      credit: false,
+      note,
+    });
+
+    return res.json({
+      message: 'Transfer successful',
+      data: transfer,
+    });
+  } catch (err: any) {
+    console.error('Internal server error: ', err.message);
+    return res.status(500).json({
+      message: 'Internal server error',
+      error: err.message,
     });
   }
 }

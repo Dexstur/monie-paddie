@@ -88,7 +88,7 @@ function SideBar({ show, activeNav = "home" }: SidebarProps) {
         </NavItem>
         <NavItem
           active={activeNav === "payment"}
-          onClick={() => navigate("/sendmoney")}
+          onClick={() => navigate("/send-money")}
         >
           <BsStack size={24} />
           <span>Payment</span>

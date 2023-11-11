@@ -7,5 +7,6 @@ const router = express.Router();
 router.post('/airtime', auth, transaction.buyAirtime);
 router.get('/balance', auth, transaction.getBalance);
 router.post('/fund', auth, transaction.fundWallet);
+router.post('/transfer', auth, transaction.bankTransfer);
 
 export default router;
