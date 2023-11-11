@@ -5,6 +5,8 @@ import SignUpPage from "./pages/signup/Signup";
 import LoginPage from "./pages/login/Login";
 import MockDashboard from "./pages/dummy-dashboard/Dashboard";
 import Sendmoneydash from "./pages/sendMoney/sendMoney-dash";
+import BuyAirtimedash  from "./pages/buyairtime/buyAirtime-dash";
+import BuyDataPage from "./pages/buyairtime/BuyDataPage";
 import Register from "./pages/register/Register";
 import Home from "./pages/bars/Home";
 import Payment from "./pages/bars/Payment";
@@ -19,6 +21,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<MockDashboard />} />
         <Route path="/sendmoney" element={<Sendmoneydash />} />
+        <Route path="/buyairtime" element={<BuyAirtimedash />} />
+        <Route path="/buy-data"  element={<BuyDataPage/>} />
         <Route path="/register" element={<Register />} />
         <Route path="/sidebar/home" element={<Home />} />
         <Route path="/sidebar/payment" element={<Payment />} />
