@@ -14,6 +14,7 @@ export interface ITransaction extends Document {
   network: string;
   dataPlan: string;
   electricityMeter: string;
+  status?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,6 +34,7 @@ const TransactionSchema: Schema = new Schema(
     network: { type: String, required: false },
     dataPlan: { type: String, required: false },
     electricityMeter: { type: String, required: false, index: true },
+    status: { type: String, required: false },
   },
   { timestamps: true },
 );

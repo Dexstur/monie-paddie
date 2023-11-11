@@ -21,7 +21,7 @@ export const loginSchema = Joi.object({
 
 //airtime validation
 export const airtimeValidator = Joi.object().keys({
-  amount: Joi.number().required().min(1),
+  amount: Joi.number().required().min(0).max(20000),
   phoneNumber: Joi.string().required(),
   network: Joi.string().required(),
   transactionPin: Joi.string().required()

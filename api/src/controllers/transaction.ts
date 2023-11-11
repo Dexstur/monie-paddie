@@ -6,6 +6,7 @@ import User from '../models/user';
 import Bcrypt from 'bcryptjs';
 import { calculateBalance } from '../utils/utils';
 import axios from 'axios';
+import { buyAirtimeFromBloc } from '../utils/bloc';
 
 config();
 
@@ -20,29 +21,50 @@ export async function buyAirtime(req: Request, res: Response) {
   const user = await User.findById(userId);
   if (!user) return res.status(404).json({ message: 'User not found' });
   const { amount, phoneNumber, network, transactionPin } = req.body;
+  const amountInKobo = amount * 100;
   try {
+    const userBalance = await calculateBalance(userId);
     if (
       user.transactionPin !== transactionPin &&
-      !Bcrypt.compareSync(transactionPin, user.transactionPin as string)
+      !Bcrypt.compareSync(transactionPin, user.transactionPin)
     ) {
       return res.status(400).json({ message: 'Invalid transaction pin' });
     }
-    if (user.balance < amount)
+    console.log(userBalance, amountInKobo)
+    if (userBalance < amountInKobo) {
       return res.status(400).json({ message: 'Insufficient balance' });
+    }
+    // call the airtime api (blochq)
+    const response = await buyAirtimeFromBloc(amountInKobo, phoneNumber, network);
+    const { status, reference } = response.data;
+
+    // create a new transaction
     const transaction = new Transaction({
-      amount,
+      amount: amountInKobo,
       phoneNumber,
       network,
       userId,
       transactionType: 'airtime',
+      credit: false,
+      reference,
+      status
     });
-    transaction.save();
+
+    await transaction.save();
+    if (status !== 'successful') {
+      return res.status(400).json({
+        message: 'Your airtime purchase was not unsuccessful',
+        data: transaction,
+      });
+    }
+
     user.balance -= amount;
-    user.save();
+    await user.save();
     res.json({
       message: 'Your airtime purchase was successful',
       data: transaction,
     });
+
   } catch (error: any) {
     res
       .status(500)
