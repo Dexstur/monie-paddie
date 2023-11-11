@@ -165,7 +165,6 @@ function BankTransfer() {
               setTimeout(() => {
                 setFeedback1("");
               }, 1500);
-              return;
             } else {
               setFeedback1("Transaction failed");
               setTimeout(() => {
