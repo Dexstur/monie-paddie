@@ -28,13 +28,14 @@ export async function buyAirtime(req: Request, res: Response) {
   const amountInKobo = amount * 100;
   try {
     const userBalance = await calculateBalance(userId);
+    user.balance = userBalance;
+    await user.save();
     if (
       user.transactionPin !== transactionPin &&
       !Bcrypt.compareSync(transactionPin, user.transactionPin)
     ) {
       return res.status(400).json({ message: 'Invalid transaction pin' });
     }
-    console.log(userBalance, amountInKobo);
     if (userBalance < amountInKobo) {
       return res.status(400).json({ message: 'Insufficient balance' });
     }
@@ -44,6 +45,10 @@ export async function buyAirtime(req: Request, res: Response) {
       phoneNumber,
       network,
     );
+    if (!response.success){
+      return res.status(400).json(response);
+    }
+
     const { status, reference } = response.data;
 
     // create a new transaction
@@ -61,7 +66,7 @@ export async function buyAirtime(req: Request, res: Response) {
     await transaction.save();
     if (status !== 'successful') {
       return res.status(400).json({
-        message: 'Your airtime purchase was not unsuccessful',
+        message: 'Your airtime purchase was unsuccessful',
         data: transaction,
       });
     }
