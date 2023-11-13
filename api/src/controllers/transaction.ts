@@ -45,7 +45,7 @@ export async function buyAirtime(req: Request, res: Response) {
       phoneNumber,
       network,
     );
-    if (!response.success){
+    if (!response.success) {
       return res.status(400).json(response);
     }
 

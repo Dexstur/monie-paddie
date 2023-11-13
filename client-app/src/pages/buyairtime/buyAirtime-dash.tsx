@@ -3,8 +3,7 @@ import Api from "../../api.config";
 import { useEffect, useState } from "react";
 import Loading from "../screens/Loading";
 import ErrorPage from "../screens/Error";
-import BuyAirtime from "./BuyAirtime"
-
+import BuyAirtime from "./BuyAirtime";
 
 function BuyAirtimedash() {
   const [data, setData] = useState(null);
@@ -32,7 +31,7 @@ function BuyAirtimedash() {
 
   if (data) {
     return (
-      <Layout activeNav="payment">
+      <Layout activeNav="payment" history={["Payment", "Buy Airtime"]}>
         <BuyAirtime display={popModal} dismiss={() => setPopModal(false)} />
         {/* <Sendmoney2 display={popModal} dismiss={() => setPopModal(false)} /> */}
       </Layout>

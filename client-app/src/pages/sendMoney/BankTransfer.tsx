@@ -222,9 +222,11 @@ function BankTransfer() {
     });
   }, []);
 
+  const history = ["Payment", "Send Money"];
+
   if (data) {
     return (
-      <Layout activeNav="payment">
+      <Layout activeNav="payment" history={history}>
         <SuccessModal
           show={success}
           title={successTitle}

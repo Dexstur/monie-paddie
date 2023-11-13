@@ -6,7 +6,7 @@ import pic3 from "../assets/pic3.jpg";
 const TopBar = styled.header`
   width: 100%;
   height: 68px;
-  padding: 12px 16px;
+  padding: 20px 16px 8px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -17,6 +17,7 @@ const TopBar = styled.header`
 
   @media (min-width: 768px) {
     justify-content: space-evenly;
+    height: 80px;
   }
 `;
 
@@ -57,11 +58,22 @@ const NavHistory = styled.div`
   width: 33%;
   display: none;
   justify-content: center;
-  align-items: center;
+  font-size: 16px;
 
   @media (min-width: 768px) {
     display: flex;
+    gap: 12px;
   }
+`;
+
+const TrackItem = styled.div<{ highlight: boolean }>`
+  color: ${({ highlight }) => (highlight ? "#283ea7" : "#bdbdbd")};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+const TrackDot = styled.span<{ highlight: boolean }>`
+  display: ${({ highlight }) => (highlight ? "block" : "none")};
 `;
 
 const BellWrap = styled.span`
@@ -91,9 +103,11 @@ const ProfilePic = styled.img`
 
 interface HeaderProps {
   toggleSidebar: () => void;
+  history?: string[];
 }
 
-function Header({ toggleSidebar }: HeaderProps) {
+function Header({ toggleSidebar, history = ["Home"] }: HeaderProps) {
+  const lastIndex = history.length - 1;
   return (
     <TopBar>
       <TopSection
@@ -105,10 +119,12 @@ function Header({ toggleSidebar }: HeaderProps) {
         <StylishText>Monie Paddy</StylishText>
       </TopSection>
       <NavHistory>
-        <div style={{ display: "flex", gap: "12px" }}>
-          <span>Home</span>
-          <span>Alt</span>
-        </div>
+        {history.map((item, index) => (
+          <TrackItem key={item} highlight={index === lastIndex}>
+            <div>{item}</div>
+            <TrackDot highlight={index === lastIndex}>•</TrackDot>
+          </TrackItem>
+        ))}
       </NavHistory>
       <TopSection
         style={{
