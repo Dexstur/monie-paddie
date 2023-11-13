@@ -5,7 +5,6 @@ import Loading from "../screens/Loading";
 import ErrorPage from "../screens/Error";
 import Buydata from "./buyData";
 
-
 function BuyDataPage() {
   const [data, setData] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
@@ -32,7 +31,7 @@ function BuyDataPage() {
 
   if (data) {
     return (
-      <Layout activeNav="payment">
+      <Layout activeNav="payment" history={["Payment", "Buy Data"]}>
         <Buydata display={popModal} dismiss={() => setPopModal(false)} />
         {/* <Sendmoney2 display={popModal} dismiss={() => setPopModal(false)} /> */}
       </Layout>
