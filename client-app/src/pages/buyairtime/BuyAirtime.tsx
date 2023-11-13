@@ -46,15 +46,37 @@ const CreateBtn = styled.button`
   background-color: var(--Pri-Color);
 `;
 
+const SelectField = styled.select`
+  width: 100%;
+  font-size: 16px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #000;
+
+  &:focus {
+    outline: none;
+    border: 2px solid var(--Pri-Color);
+  }
+
+  @media (min-width: 768px) {
+    padding: 16px 12px;
+  }
+`;
+
+
 interface BuyAirtimeprops {
   display: boolean;
   dismiss: () => void;
 }
 
-function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
+function BuyAirtime({ display }: BuyAirtimeprops) {
   const [formData, setFormData] = useState({
-    accountNumber: "",
-    accountName: "",
+    network: "",
+    phoneNumber: "",
+    amount: "",
+    transactionPin: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -67,45 +89,43 @@ function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
       setButtonText("Proceed");
     }
   }, [submitting]);
-  function handleChange(e: ChangeEvent<HTMLInputElement>) {
+  function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;
-    if (/^\d*$/.test(value) && value.length <= 4) {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }))
   }
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!submitting) {
-      if (formData.accountNumber !== formData.accountName) {
-        setFeedback("Data mismatch");
-        return;
-      }
-      setSubmitting(true);
-      Api.put("/users/create-pin", formData)
-        .then(() => {
-          setFeedback("Account created successfully");
-          setSubmitting(false);
-          setFormData({
-            accountNumber: "",
-            accountName: "",
-          });
-          setTimeout(() => {
-            setFeedback("");
-            dismiss();
-          }, 1500);
+    setSubmitting(true);
+    Api.post("/transactions/airtime", formData)
+      .then(() => {
+        setSubmitting(false);
+        setFeedback("Airtime bought successfully");
+      })
+      .catch(() => {
+        setFeedback("Airtime purchase failed");
+      })
+      .finally(() => {
+        setSubmitting(false);
+        setFormData({
+          network: "",
+          phoneNumber: "",
+          amount: "",
+          transactionPin: "",
         })
-        .catch(() => {
-          setFeedback("Account creation failed");
-          setSubmitting(false);
-        });
-    }
+        setTimeout(() => {
+          setFeedback("");
+        }, 3000);
+      })
   }
 
   return (
     <Wrapper show={display}>
       <div>
-        <img src="/images/transfer.svg" alt="transfer" />
+        <img src="/Connection.svg" alt="airtime" />
         <Msg>Enter your details to buy airtime </Msg>
       </div>
       <form onSubmit={handleSubmit}>
@@ -113,12 +133,19 @@ function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
           <InputHead>
             <Label htmlFor="network">Network</Label>
           </InputHead>
-          <InputField
+          <SelectField
             id="network"
             name="network"
-            placeholder="Select network"
-            type="text"
-          />
+            value={formData.network}
+            onChange={handleChange}
+            required
+          >
+            <option value=""> -- Select network -- </option>
+            <option value="mtn">Mtn</option>
+            <option value="glo">Glo</option>
+            <option value="airtel">Airtel</option>
+            <option value="9mobile">9mobile</option>
+          </SelectField>
         </div>
         <div className="my-1">
           <InputHead>
@@ -126,10 +153,10 @@ function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
           </InputHead>
           <InputField
             id="phonenumber"
-            name="phonenumber"
+            name="phoneNumber"
             placeholder="08099999123"
             type="number"
-            value={formData.accountNumber}
+            value={formData.phoneNumber}
             onChange={handleChange}
             minLength={11}
             maxLength={11}
@@ -144,12 +171,12 @@ function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
           <InputField
             id="amount"
             name="amount"
-            placeholder="John Doe"
+            placeholder="100"
             type="number"
-            value={formData.accountNumber}
+            value={formData.amount}
             onChange={handleChange}
-            minLength={12}
-            maxLength={12}
+            min={1}
+            max={20000}
             required
           />
         </div>
@@ -160,10 +187,10 @@ function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
           </InputHead>
           <InputField
             id="pin"
-            name="pin"
+            name="transactionPin"
             placeholder="Enter transaction pin"
-            type="number"
-            value={formData.accountNumber}
+            type="password"
+            value={formData.transactionPin}
             onChange={handleChange}
             minLength={4}
             maxLength={4}
@@ -171,7 +198,7 @@ function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
           />
         </div>
         <br></br>
-        <CreateBtn type="submit">{buttonText}</CreateBtn>
+        <CreateBtn disabled={submitting} type="submit">{buttonText}</CreateBtn>
       </form>
       <Msg>{feedback}</Msg>
     </Wrapper>

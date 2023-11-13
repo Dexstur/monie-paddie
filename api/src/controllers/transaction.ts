@@ -11,6 +11,7 @@ import Bcrypt from 'bcryptjs';
 import { calculateBalance } from '../utils/utils';
 import axios from 'axios';
 import { buyAirtimeFromBloc } from '../utils/bloc';
+import dev from '../utils/logs';
 
 config();
 
@@ -45,11 +46,18 @@ export async function buyAirtime(req: Request, res: Response) {
       phoneNumber,
       network,
     );
-    if (!response.success) {
-      return res.status(400).json(response);
+    if (!response.success){
+      dev.log(response);
+      return res.status(501).json(response);
     }
 
     const { status, reference } = response.data;
+
+    if (status !== 'successful') {
+      return res.status(503).json({
+        message: 'Your airtime purchase was unsuccessful',
+      });
+    }
 
     // create a new transaction
     const transaction = new Transaction({
@@ -64,12 +72,6 @@ export async function buyAirtime(req: Request, res: Response) {
     });
 
     await transaction.save();
-    if (status !== 'successful') {
-      return res.status(400).json({
-        message: 'Your airtime purchase was unsuccessful',
-        data: transaction,
-      });
-    }
 
     user.balance -= amount;
     await user.save();
