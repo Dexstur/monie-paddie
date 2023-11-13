@@ -22,23 +22,28 @@ const Content = styled.div`
   position: relative;
 
   @media (min-width: 768px) {
-    padding: 68px 0px 0px 240px;
+    padding: 80px 0px 0px 240px;
   }
 `;
 
 interface LayoutProps {
   children: ReactNode;
   activeNav?: "home" | "payment" | "settings";
+  history?: string[];
 }
 
-function Layout({ children, activeNav = "home" }: LayoutProps) {
+function Layout({
+  children,
+  activeNav = "home",
+  history = ["Home"],
+}: LayoutProps) {
   const [showSidebar, setShowSidebar] = useState(false);
   function toggleSidebar() {
     setShowSidebar((prev) => !prev);
   }
   return (
     <Wrapper>
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} history={history} />
       <SideBar show={showSidebar} activeNav={activeNav} />
       <Content>{children}</Content>
     </Wrapper>
