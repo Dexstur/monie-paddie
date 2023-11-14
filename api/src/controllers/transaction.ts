@@ -246,6 +246,38 @@ export async function bankTransfer(req: Request, res: Response) {
   }
 }
 
+export async function searchTransactions(req: Request, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: 'No token provided',
+        error: 'Unauthorised',
+      });
+    }
+
+    const searchQuery = req.query.search as string;
+
+    const transactions = await Transaction.find({
+      $or: [
+        { bankName: { $regex: searchQuery, $options: 'i' } },
+        { accountNumber: { $regex: searchQuery, $options: 'i' } },
+        { accountName: { $regex: searchQuery, $options: 'i' } },
+        // Add other fields you want to search by
+      ],
+    });
+
+    return res.json({
+      message: 'Transactions',
+      data: transactions,
+    });
+  } catch (err: any) {
+    console.error('Internal server error: ', err.message);
+    return res.status(500).json({
+      message: 'Internal server error',
+      error: err.message,
+    });
+  }
+}
 function runCommand() {
   axios
     .get(`https://api.paystack.co/transaction/verify/T191080192909981`, {
