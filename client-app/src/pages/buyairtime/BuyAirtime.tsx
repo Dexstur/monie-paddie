@@ -1,30 +1,14 @@
 import { styled } from "styled-components";
 import { InputField, InputHead, Label } from "../signup/Signup.style";
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import {
+  Wrapper,
+  Top,
+  LogoWrap,
+  Logo,
+  TopMessage,
+} from "../sendMoney/BankTransfer.style";
 import Api from "../../api.config";
-
-const Wrapper = styled.div<{ show: boolean }>`
-  width: 600px;
-  height: auto;
-  padding: 24px;
-  position: static;
-  z-index: 400;
-  margin: 0 auto;
-
-  right: auto;
-  display: ${({ show }) => (show ? "flex" : "none")};
-  flex-direction: column;
-  gap: 16px;
-  background-color: #fff;
-  border-radius: 8px;
-
-  @media (min-width: 768px) {
-    width: 616px;
-    height: auto;
-    padding: 40px;
-    gap: 24px;
-  }
-`;
 
 const Msg = styled.p`
   font-size: 14px;
@@ -44,6 +28,10 @@ const CreateBtn = styled.button`
   text-align: center;
   border: none;
   background-color: var(--Pri-Color);
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
 const SelectField = styled.select`
@@ -65,13 +53,12 @@ const SelectField = styled.select`
   }
 `;
 
-
 interface BuyAirtimeprops {
-  display: boolean;
-  dismiss: () => void;
+  display?: boolean;
+  success?: () => void;
 }
 
-function BuyAirtime({ display }: BuyAirtimeprops) {
+function BuyAirtime({ display = true, success = () => null }: BuyAirtimeprops) {
   const [formData, setFormData] = useState({
     network: "",
     phoneNumber: "",
@@ -94,7 +81,7 @@ function BuyAirtime({ display }: BuyAirtimeprops) {
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value,
-    }))
+    }));
   }
 
   function handleSubmit(e: FormEvent) {
@@ -104,6 +91,7 @@ function BuyAirtime({ display }: BuyAirtimeprops) {
       .then(() => {
         setSubmitting(false);
         setFeedback("Airtime bought successfully");
+        success();
       })
       .catch(() => {
         setFeedback("Airtime purchase failed");
@@ -115,19 +103,21 @@ function BuyAirtime({ display }: BuyAirtimeprops) {
           phoneNumber: "",
           amount: "",
           transactionPin: "",
-        })
+        });
         setTimeout(() => {
           setFeedback("");
         }, 3000);
-      })
+      });
   }
 
   return (
     <Wrapper show={display}>
-      <div>
-        <img src="/Connection.svg" alt="airtime" />
-        <Msg>Enter your details to buy airtime </Msg>
-      </div>
+      <Top>
+        <LogoWrap>
+          <Logo src="/Phone.png" alt="airtime" />
+        </LogoWrap>
+        <TopMessage>Enter your details to buy airtime </TopMessage>
+      </Top>
       <form onSubmit={handleSubmit}>
         <div className="my-1">
           <InputHead>
@@ -198,7 +188,9 @@ function BuyAirtime({ display }: BuyAirtimeprops) {
           />
         </div>
         <br></br>
-        <CreateBtn disabled={submitting} type="submit">{buttonText}</CreateBtn>
+        <CreateBtn disabled={submitting} type="submit">
+          {buttonText}
+        </CreateBtn>
       </form>
       <Msg>{feedback}</Msg>
     </Wrapper>
