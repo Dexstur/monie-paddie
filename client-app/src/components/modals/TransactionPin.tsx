@@ -135,7 +135,7 @@ function CreatePin({ display, dismiss }: CreatePinProps) {
         </div>
         <div className="my-3">
           <InputHead>
-            <Label htmlFor="pinConfirmation">Create Pin</Label>
+            <Label htmlFor="pinConfirmation">Confirm Pin</Label>
           </InputHead>
           <InputField
             id="pinConfirmation"

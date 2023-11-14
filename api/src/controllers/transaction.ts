@@ -21,7 +21,11 @@ const ps_secret = process.env.PAYSTACK_SECRET;
 export async function buyAirtime(req: Request, res: Response) {
   const userId = req.user;
   const { error } = airtimeValidator.validate(req.body, options);
-  if (error) return res.status(400).json({ message: error.message });
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: 'Bad request', error: error.message });
+  }
 
   const user = await User.findById(userId);
   if (!user) return res.status(404).json({ message: 'User not found' });
@@ -35,10 +39,34 @@ export async function buyAirtime(req: Request, res: Response) {
       user.transactionPin !== transactionPin &&
       !Bcrypt.compareSync(transactionPin, user.transactionPin)
     ) {
-      return res.status(400).json({ message: 'Invalid transaction pin' });
+      return res.status(403).json({
+        message: 'Purchase failed',
+        error: 'Invalid transaction pin',
+      });
     }
     if (userBalance < amountInKobo) {
-      return res.status(400).json({ message: 'Insufficient balance' });
+      return res.status(400).json({
+        message: 'Purchase failed',
+        error: 'Insufficient balance',
+      });
+    }
+
+    const appState = 'testing';
+
+    if (appState === 'testing') {
+      const dudTransaction = await Transaction.create({
+        amount: amountInKobo,
+        phoneNumber,
+        network,
+        userId,
+        transactionType: 'airtime',
+        credit: false,
+      });
+
+      return res.json({
+        message: 'Purchase successful',
+        data: dudTransaction,
+      });
     }
     // call the airtime api (blochq)
     const response = await buyAirtimeFromBloc(
@@ -46,7 +74,7 @@ export async function buyAirtime(req: Request, res: Response) {
       phoneNumber,
       network,
     );
-    if (!response.success){
+    if (!response.success) {
       dev.log(response);
       return res.status(501).json(response);
     }
