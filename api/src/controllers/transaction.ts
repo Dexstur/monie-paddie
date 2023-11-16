@@ -485,53 +485,63 @@ export async function buyData(req: Request, res: Response) {
   }
 }
 
-export async function searchTransactions(req: Request, res: Response) {
+export async function getTransactions(req: Request, res: Response) {
   try {
     if (!req.user) {
       return res.status(401).json({
-        message: 'No token provided',
-        error: 'Unauthorised',
+        message: "No token provided",
+        error: "Unauthorised",
       });
     }
+    const { search, filter, page = 1, pageSize = 10 } = req.query;
+    let query: any = { userId: req.user}
+    if (search) {
+      query.$or = [
+        {transactionType: {$regex: search as string, $options: 'i'}},
+        { accountName: { $regex: search as string, $options: 'i' } },
+        { accountNumber: { $regex: search as string, $options: 'i' } },
+        { bankName: { $regex: search as string, $options: 'i' } },
+        { phoneNumber: { $regex: search as string, $options: 'i' } },
+        { network: { $regex: search as string, $options: 'i' } },
+        { dataPlan: { $regex: search as string, $options: 'i' } },
+        { electricityMeterNo: { $regex: search as string, $options: 'i' } },
+        { note: { $regex: search as string, $options: 'i' } },
+      ];
+    }
+    if (filter === "successful" || filter === "failed") {
+      query.status = filter;
+    }
+    if (filter === "true" || filter === "false") {
+      query.credit = filter;
+    }
+    if ( filter === "all") {
+      query = {}
+    }
 
-    const searchQuery = req.query.search as string;
-    const page = Number(req.query.page) || 1;
-    const pageSize = Number(req.query.pageSize) || 10;
+    const skip = (Number(page) - 1) * Number(pageSize);
 
-    const skip = (page - 1) * pageSize;
+     console.log('Query:', query);
 
-    const transactions = await Transaction.find({
-      $or: [
-        { bankName: { $regex: searchQuery, $options: 'i' } },
-        { accountNumber: { $regex: searchQuery, $options: 'i' } },
-        { accountName: { $regex: searchQuery, $options: 'i' } },
-        // Add other fields you want to search by
-      ],
-    })
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(pageSize);
+    const transactions = await Transaction.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(pageSize));
 
-    const total = await Transaction.countDocuments({
-      $or: [
-        { bankName: { $regex: searchQuery, $options: 'i' } },
-        { accountNumber: { $regex: searchQuery, $options: 'i' } },
-        { accountName: { $regex: searchQuery, $options: 'i' } },
-        // Add other fields you want to search by
-      ],
-    });
+      const total = await Transaction.countDocuments(query);
+    console.log('Transactions:', transactions);
 
     return res.json({
-      transactions,
-      page,
-      pageSize,
+      message: "Transactions",
+      data: transactions,
+      page: Number(page),
+      pageSize: Number(pageSize),
       total,
-      totalPages: Math.ceil(total / pageSize),
+      totalPages: Math.ceil(total / Number(pageSize)),
     });
-  } catch (err: any) {
-    console.error('Internal server error: ', err.message);
+  }catch (err: any) {
+    console.error("Internal server error: ", err.message);
     return res.status(500).json({
-      message: 'Internal server error',
+      message: "Internal server error",
       error: err.message,
     });
   }
