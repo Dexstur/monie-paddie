@@ -68,6 +68,8 @@ export async function buyAirtime(req: Request, res: Response) {
         network,
         userId,
         transactionType: 'airtime',
+        accountName: phoneNumber,
+        bankName: network,
         credit: false,
       });
 
@@ -459,8 +461,9 @@ export async function buyData(req: Request, res: Response) {
           amount: dataCost,
           userId: req.user,
           credit: false,
-          bankName: provider,
-          accountName: 'Data',
+          bankName: provider.toUpperCase(),
+          accountName: phoneNumber,
+          phoneNumber,
           dataPlan: plan,
         });
         transaction.save();
@@ -489,15 +492,15 @@ export async function getTransactions(req: Request, res: Response) {
   try {
     if (!req.user) {
       return res.status(401).json({
-        message: "No token provided",
-        error: "Unauthorised",
+        message: 'No token provided',
+        error: 'Unauthorised',
       });
     }
-    const { search, filter, page = 1, pageSize = 10 } = req.query;
-    let query: any = { userId: req.user}
+    const { search = '', filter = '', page = 1, pageSize = 10 } = req.query;
+    let query: any = { userId: req.user };
     if (search) {
       query.$or = [
-        {transactionType: {$regex: search as string, $options: 'i'}},
+        { transactionType: { $regex: search as string, $options: 'i' } },
         { accountName: { $regex: search as string, $options: 'i' } },
         { accountNumber: { $regex: search as string, $options: 'i' } },
         { bankName: { $regex: search as string, $options: 'i' } },
@@ -508,55 +511,51 @@ export async function getTransactions(req: Request, res: Response) {
         { note: { $regex: search as string, $options: 'i' } },
       ];
     }
-    if (filter === "successful" || filter === "failed") {
-      query.status = filter;
+    const sort = filter === 'oldest' ? 1 : -1;
+    if (filter === 'credit') {
+      query.credit = true;
     }
-    if (filter === "true" || filter === "false") {
-      query.credit = filter;
-    }
-    if ( filter === "all") {
-      query = {}
+    if (filter === 'debit') {
+      query.credit = false;
     }
 
     const skip = (Number(page) - 1) * Number(pageSize);
 
-     console.log('Query:', query);
+    // console.log('Query:', query);
 
     const transactions = await Transaction.find(query)
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: sort })
       .skip(skip)
       .limit(Number(pageSize));
 
-      const total = await Transaction.countDocuments(query);
-    console.log('Transactions:', transactions);
+    const total = await Transaction.countDocuments(query);
+    // console.log('Transactions:', transactions);
 
     return res.json({
-      message: "Transactions",
+      message: 'Transactions',
       data: transactions,
       page: Number(page),
       pageSize: Number(pageSize),
       total,
       totalPages: Math.ceil(total / Number(pageSize)),
     });
-  }catch (err: any) {
-    console.error("Internal server error: ", err.message);
+  } catch (err: any) {
+    console.error('Internal server error: ', err.message);
     return res.status(500).json({
-      message: "Internal server error",
+      message: 'Internal server error',
       error: err.message,
     });
   }
 }
+
+async function action() {
+  const dataTransactions = await Transaction.find({
+    transactionType: 'data',
+  });
+  dataTransactions.forEach(async (transaction) => {
+    await Transaction.deleteOne({ _id: transaction._id });
+  });
+}
 function runCommand() {
-  axios
-    .get(`https://api.paystack.co/transaction/verify/T191080192909981`, {
-      headers: {
-        Authorization: `Bearer ${ps_secret}`,
-      },
-    })
-    .then((response) => {
-      console.log('Response:', response.data);
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
+  action().then(() => console.log('Done'));
 }
