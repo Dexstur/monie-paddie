@@ -12,6 +12,7 @@ import Mastercard from "../../assets/mastercard.png";
 import { CardDetails, UserDetails, Wrapper, Text } from "./CardDetails.style";
 import FrequentTransfers from "./FrequentTransactions.style";
 import Referrals from "./Referral.style";
+import ListTransactions from "./Aside";
 
 function MockDashboard() {
   const [data, setData] = useState(null);
@@ -107,7 +108,9 @@ function MockDashboard() {
               <Referrals />
             </Wrapper>
           </OptionSide>
-          <TransactionSide className="col-12 col-lg-4"></TransactionSide>
+          <TransactionSide className="col-12 col-lg-4 m-0 p-0">
+            <ListTransactions refresh={newFund} />
+          </TransactionSide>
         </div>
       </Layout>
     );
