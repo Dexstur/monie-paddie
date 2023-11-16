@@ -29,7 +29,7 @@ function MockDashboard() {
     setSuccessTitle(`Congratulations ${username}`);
     setSuccessMessage("You have successfully funded your wallet");
     setShowSuccess(true);
-    setNewFund((prev) => !prev);
+    setNewFund(!newFund);
   }
 
   useEffect(() => {

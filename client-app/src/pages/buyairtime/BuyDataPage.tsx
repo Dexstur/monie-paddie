@@ -4,21 +4,26 @@ import { useEffect, useState } from "react";
 import Loading from "../screens/Loading";
 import ErrorPage from "../screens/Error";
 import Buydata from "./buyData";
-
+import SuccessModal from "../../components/modals/successModal";
 
 function BuyDataPage() {
   const [data, setData] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const [popModal, setPopModal] = useState(true);
+  const [success, setSuccess] = useState(false);
+  const [successTitle, setSuccessTitle] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
+  function handleSuccess() {
+    setSuccessTitle("Congratulations");
+    setSuccessMsg("Your data purchase was successful");
+    setSuccess(true);
+  }
 
   useEffect(() => {
     Api.get("/users/dashboard")
       .then((res) => {
-        const { message, setPin } = res.data;
+        const { message } = res.data;
         setData(message);
-        if (!setPin) {
-          setPopModal(true);
-        }
       })
       .catch((err) => {
         if (err.response) {
@@ -32,9 +37,17 @@ function BuyDataPage() {
 
   if (data) {
     return (
-      <Layout activeNav="payment">
-        <Buydata display={popModal} dismiss={() => setPopModal(false)} />
-        {/* <Sendmoney2 display={popModal} dismiss={() => setPopModal(false)} /> */}
+      <Layout activeNav="payment" history={["Payment", "Buy Data"]}>
+        <SuccessModal
+          id="successModal"
+          show={success}
+          title={successTitle}
+          message={successMsg}
+          handleClose={() => setSuccess(false)}
+        />
+        <div style={{ padding: "40px 0" }}>
+          <Buydata display={true} success={handleSuccess} />
+        </div>
       </Layout>
     );
   }

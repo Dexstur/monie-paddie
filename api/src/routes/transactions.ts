@@ -8,5 +8,8 @@ router.post('/airtime', auth, transaction.buyAirtime);
 router.get('/balance', auth, transaction.getBalance);
 router.post('/fund', auth, transaction.fundWallet);
 router.post('/transfer', auth, transaction.bankTransfer);
+router.get('/networks', auth, transaction.listNetworks);
+router.get('/data', auth, transaction.listDataPlans);
+router.post('/data', auth, transaction.buyData);
 
 export default router;

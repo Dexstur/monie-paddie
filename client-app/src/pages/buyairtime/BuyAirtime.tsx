@@ -1,30 +1,14 @@
 import { styled } from "styled-components";
 import { InputField, InputHead, Label } from "../signup/Signup.style";
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import {
+  Wrapper,
+  Top,
+  LogoWrap,
+  Logo,
+  TopMessage,
+} from "../sendMoney/BankTransfer.style";
 import Api from "../../api.config";
-
-const Wrapper = styled.div<{ show: boolean }>`
-  width: 600px;
-  height: auto;
-  padding: 24px;
-  position: static;
-  z-index: 400;
-  margin: 0 auto;
-
-  right: auto;
-  display: ${({ show }) => (show ? "flex" : "none")};
-  flex-direction: column;
-  gap: 16px;
-  background-color: #fff;
-  border-radius: 8px;
-
-  @media (min-width: 768px) {
-    width: 616px;
-    height: auto;
-    padding: 40px;
-    gap: 24px;
-  }
-`;
 
 const Msg = styled.p`
   font-size: 14px;
@@ -44,17 +28,42 @@ const CreateBtn = styled.button`
   text-align: center;
   border: none;
   background-color: var(--Pri-Color);
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+const SelectField = styled.select`
+  width: 100%;
+  font-size: 16px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #000;
+
+  &:focus {
+    outline: none;
+    border: 2px solid var(--Pri-Color);
+  }
+
+  @media (min-width: 768px) {
+    padding: 16px 12px;
+  }
 `;
 
 interface BuyAirtimeprops {
-  display: boolean;
-  dismiss: () => void;
+  display?: boolean;
+  success?: () => void;
 }
 
-function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
+function BuyAirtime({ display = true, success = () => null }: BuyAirtimeprops) {
   const [formData, setFormData] = useState({
-    accountNumber: "",
-    accountName: "",
+    network: "",
+    phoneNumber: "",
+    amount: "",
+    transactionPin: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -67,58 +76,66 @@ function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
       setButtonText("Proceed");
     }
   }, [submitting]);
-  function handleChange(e: ChangeEvent<HTMLInputElement>) {
+  function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;
-    if (/^\d*$/.test(value) && value.length <= 4) {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
   }
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!submitting) {
-      if (formData.accountNumber !== formData.accountName) {
-        setFeedback("Data mismatch");
-        return;
-      }
-      setSubmitting(true);
-      Api.put("/users/create-pin", formData)
-        .then(() => {
-          setFeedback("Account created successfully");
-          setSubmitting(false);
-          setFormData({
-            accountNumber: "",
-            accountName: "",
-          });
-          setTimeout(() => {
-            setFeedback("");
-            dismiss();
-          }, 1500);
-        })
-        .catch(() => {
-          setFeedback("Account creation failed");
-          setSubmitting(false);
+    setSubmitting(true);
+    Api.post("/transactions/airtime", formData)
+      .then(() => {
+        setSubmitting(false);
+        setFeedback("Airtime bought successfully");
+        success();
+      })
+      .catch(() => {
+        setFeedback("Airtime purchase failed");
+      })
+      .finally(() => {
+        setSubmitting(false);
+        setFormData({
+          network: "",
+          phoneNumber: "",
+          amount: "",
+          transactionPin: "",
         });
-    }
+        setTimeout(() => {
+          setFeedback("");
+        }, 3000);
+      });
   }
 
   return (
     <Wrapper show={display}>
-      <div>
-        <img src="/images/transfer.svg" alt="transfer" />
-        <Msg>Enter your details to buy airtime </Msg>
-      </div>
+      <Top>
+        <LogoWrap>
+          <Logo src="/Phone.png" alt="airtime" />
+        </LogoWrap>
+        <TopMessage>Enter your details to buy airtime </TopMessage>
+      </Top>
       <form onSubmit={handleSubmit}>
         <div className="my-1">
           <InputHead>
             <Label htmlFor="network">Network</Label>
           </InputHead>
-          <InputField
+          <SelectField
             id="network"
             name="network"
-            placeholder="Select network"
-            type="text"
-          />
+            value={formData.network}
+            onChange={handleChange}
+            required
+          >
+            <option value=""> -- Select network -- </option>
+            <option value="mtn">Mtn</option>
+            <option value="glo">Glo</option>
+            <option value="airtel">Airtel</option>
+            <option value="9mobile">9mobile</option>
+          </SelectField>
         </div>
         <div className="my-1">
           <InputHead>
@@ -126,10 +143,10 @@ function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
           </InputHead>
           <InputField
             id="phonenumber"
-            name="phonenumber"
+            name="phoneNumber"
             placeholder="08099999123"
             type="number"
-            value={formData.accountNumber}
+            value={formData.phoneNumber}
             onChange={handleChange}
             minLength={11}
             maxLength={11}
@@ -144,12 +161,12 @@ function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
           <InputField
             id="amount"
             name="amount"
-            placeholder="John Doe"
+            placeholder="100"
             type="number"
-            value={formData.accountNumber}
+            value={formData.amount}
             onChange={handleChange}
-            minLength={12}
-            maxLength={12}
+            min={1}
+            max={20000}
             required
           />
         </div>
@@ -160,10 +177,10 @@ function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
           </InputHead>
           <InputField
             id="pin"
-            name="pin"
+            name="transactionPin"
             placeholder="Enter transaction pin"
-            type="number"
-            value={formData.accountNumber}
+            type="password"
+            value={formData.transactionPin}
             onChange={handleChange}
             minLength={4}
             maxLength={4}
@@ -171,7 +188,9 @@ function BuyAirtime({ display, dismiss }: BuyAirtimeprops) {
           />
         </div>
         <br></br>
-        <CreateBtn type="submit">{buttonText}</CreateBtn>
+        <CreateBtn disabled={submitting} type="submit">
+          {buttonText}
+        </CreateBtn>
       </form>
       <Msg>{feedback}</Msg>
     </Wrapper>
