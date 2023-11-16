@@ -1,38 +1,39 @@
 import { styled } from "styled-components";
 import { InputField, InputHead, Label } from "../signup/Signup.style";
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import {
+  Wrapper,
+  Top,
+  LogoWrap,
+  Logo,
+  TopMessage,
+} from "../sendMoney/BankTransfer.style";
 import Api from "../../api.config";
-
-const Wrapper = styled.div<{ show: boolean }>`
-  width: 600px;
-  height: auto;
-  padding: 24px;
-  position: static;
-  z-index: 400;
-  margin: 0 auto;
-  
-  
-
-  right: auto;
-  display: ${({ show }) => (show ? "flex" : "none")};
-  flex-direction: column;
-  gap: 16px;
-  background-color: #fff;
-  border-radius: 8px;
-
-  @media (min-width: 768px) {
-    width: 616px;
-    height: auto;
-    padding: 40px;
-    gap: 24px;
-  }
-`;
 
 const Msg = styled.p`
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
   color: #737373;
+`;
+
+const SelectInput = styled.select`
+  width: 100%;
+  font-size: 16px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #000;
+
+  &:focus {
+    outline: none;
+    border: 2px solid var(--Pri-Color);
+  }
+
+  @media (min-width: 768px) {
+    padding: 16px 12px;
+  }
 `;
 
 const CreateBtn = styled.button`
@@ -50,17 +51,47 @@ const CreateBtn = styled.button`
 
 interface Buydataprops {
   display: boolean;
-  dismiss: () => void;
+  success?: () => void;
 }
 
-function Buydata({ display, dismiss }: Buydataprops) {
+interface Network {
+  id: string;
+  name: string;
+}
+
+interface DataMeta {
+  data_expiry: string;
+  currency: string;
+  data_value: string;
+  fee: string;
+}
+
+export interface PlanReturn {
+  id: string;
+  meta: DataMeta;
+}
+
+interface PlansListItem {
+  id: string;
+  plan: string;
+}
+
+const emptyNetwork: Network = { id: "", name: "Select Network" };
+const emptyPlan: PlansListItem = { id: "", plan: "Select network to get plan" };
+
+function Buydata({ display, success = () => null }: Buydataprops) {
   const [formData, setFormData] = useState({
-    accountNumber: "",
-    accountName: "",
+    network: "",
+    plan: "",
+    pin: "",
+    phoneNumber: "",
+    provider: "",
   });
   const [submitting, setSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState("fetching networks...");
   const [buttonText, setButtonText] = useState("Proceed");
+  const [networks, setNetworks] = useState<Network[]>([emptyNetwork]);
+  const [plans, setPlans] = useState<PlansListItem[]>([emptyPlan]);
 
   useEffect(() => {
     if (submitting) {
@@ -69,36 +100,116 @@ function Buydata({ display, dismiss }: Buydataprops) {
       setButtonText("Proceed");
     }
   }, [submitting]);
-  function handleChange(e: ChangeEvent<HTMLInputElement>) {
+  function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;
-    if (/^\d*$/.test(value) && value.length <= 4) {
+    if (name === "pin") {
+      if (/^\d*$/.test(value) && value.length <= 4) {
+        setFormData({ ...formData, pin: value });
+      }
+    } else if (name === "phoneNumber") {
+      if (/^\d*$/.test(value) && value.length <= 11) {
+        setFormData({ ...formData, phoneNumber: value });
+      }
+    } else {
       setFormData({ ...formData, [name]: value });
+    }
+  }
+
+  useEffect(() => {
+    Api.get("transactions/networks")
+      .then((res) => {
+        setNetworks([emptyNetwork, ...res.data.data]);
+        setFeedback("");
+      })
+      .catch(() => {
+        setFeedback("Unable to fetch networks");
+      });
+  }, []);
+
+  function fetchPlans(e: ChangeEvent<HTMLSelectElement>) {
+    const id = e.target.value;
+
+    setFormData({ ...formData, network: id });
+    if (id === "") {
+      emptyPlan.plan = "Select network to get plan";
+      setPlans([emptyPlan]);
+    } else {
+      setFeedback("fetching plans...");
+      emptyPlan.plan = "Select network to get plan";
+      setPlans([emptyPlan]);
+      Api.get(`/transactions/data?id=${id}`)
+        .then((res) => {
+          const dataPlans: PlanReturn[] = res.data.data;
+          const formatPlans: PlansListItem[] = dataPlans.map((plan) => ({
+            id: plan.id,
+            plan: `${plan.meta.data_value} for ${plan.meta.data_expiry} @ ${plan.meta.currency}${plan.meta.fee}`,
+          }));
+          emptyPlan.plan = "Select a plan";
+          const provider = networks.find((network) => network.id === id)?.name;
+          if (provider) {
+            setFormData({ ...formData, network: id, provider });
+          }
+          setPlans([emptyPlan, ...formatPlans]);
+
+          setFeedback("");
+        })
+        .catch(() => {
+          setFeedback("Unable to fetch plans");
+        });
     }
   }
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!submitting) {
-      if (formData.accountNumber !== formData.accountName) {
-        setFeedback("Data mismatch");
-        return;
-      }
       setSubmitting(true);
-      Api.put("/users/create-pin", formData)
+      Api.post("/transactions/data", formData)
         .then(() => {
-          setFeedback("Account created successfully");
+          setFeedback("Data purchase succesful");
+          success();
           setSubmitting(false);
           setFormData({
-            accountNumber: "",
-            accountName: "",
+            network: "",
+            plan: "",
+            pin: "",
+            phoneNumber: "",
+            provider: "",
           });
+          emptyPlan.plan = "Select network to get plan";
+          setPlans([emptyPlan]);
           setTimeout(() => {
             setFeedback("");
-            dismiss();
           }, 1500);
         })
-        .catch(() => {
-          setFeedback("Account creation failed");
+        .catch((err) => {
+          if (err.response) {
+            const code = err.response.status;
+            if (code === 400) {
+              setFeedback("Invalid plan");
+            } else if (code === 403) {
+              setFeedback("Invalid transaction pin");
+            } else if (code === 409) {
+              setFeedback("Insufficient funds");
+            } else {
+              setFeedback("Could not purchase plan");
+            }
+          } else {
+            setFeedback("Data transaction failed");
+          }
+          setFormData({
+            network: "",
+            plan: "",
+            pin: "",
+            phoneNumber: "",
+            provider: "",
+          });
+          emptyPlan.plan = "Select network to get plan";
+          setPlans([emptyPlan]);
+
+          setTimeout(() => {
+            setFeedback("");
+          }, 1500);
+
           setSubmitting(false);
         });
     }
@@ -106,32 +217,40 @@ function Buydata({ display, dismiss }: Buydataprops) {
 
   return (
     <Wrapper show={display}>
-      <div>
-        <img src="/images/transfer.svg" alt="transfer" />
-        <Msg>Enter your details to buy data</Msg>
-      </div>
+      <Top>
+        <LogoWrap>
+          <Logo src="/Connection.png" alt="data" />
+        </LogoWrap>
+        <TopMessage>Enter your details to buy data</TopMessage>
+      </Top>
       <form onSubmit={handleSubmit}>
         <div className="my-1">
           <InputHead>
             <Label htmlFor="network">Network</Label>
           </InputHead>
-          <InputField
+          <SelectInput
             id="network"
-            name="network"
-            placeholder="Select network"
-            type="text"
-          />
+            value={formData.network}
+            onChange={fetchPlans}
+            required
+          >
+            {networks.map((network) => (
+              <option key={network.id} value={network.id}>
+                {network.name}
+              </option>
+            ))}
+          </SelectInput>
         </div>
         <div className="my-1">
           <InputHead>
-            <Label htmlFor="phonenumber">Phone Number</Label>
+            <Label htmlFor="phoneNumber">Phone Number</Label>
           </InputHead>
           <InputField
-            id="phonenumber"
-            name="phonenumber"
+            id="phoneNumber"
+            name="phoneNumber"
             placeholder="08099999123"
-            type="number"
-            value={formData.accountNumber}
+            type="text"
+            value={formData.phoneNumber}
             onChange={handleChange}
             minLength={11}
             maxLength={11}
@@ -143,17 +262,19 @@ function Buydata({ display, dismiss }: Buydataprops) {
           <InputHead>
             <Label htmlFor="dataplan">Data Plan</Label>
           </InputHead>
-          <InputField
+          <SelectInput
+            value={formData.plan}
             id="dataplan"
-            name="dataplan"
-            placeholder="select data plans"
-            type="number"
-            value={formData.accountName}
+            name="plan"
             onChange={handleChange}
-            minLength={12}
-            maxLength={12}
             required
-          />
+          >
+            {plans.map((plan) => (
+              <option key={plan.id} value={plan.id}>
+                {plan.plan}
+              </option>
+            ))}
+          </SelectInput>
         </div>
 
         <div className="m-1">
@@ -164,16 +285,16 @@ function Buydata({ display, dismiss }: Buydataprops) {
             id="pin"
             name="pin"
             placeholder="Enter transaction pin"
-            type="number"
-            value={formData.accountNumber}
+            type="password"
+            value={formData.pin}
             onChange={handleChange}
             minLength={4}
             maxLength={4}
             required
           />
         </div>
-      <br></br>
-        <CreateBtn  type="submit">{buttonText}</CreateBtn>
+        <br></br>
+        <CreateBtn type="submit">{buttonText}</CreateBtn>
       </form>
       <Msg>{feedback}</Msg>
     </Wrapper>
