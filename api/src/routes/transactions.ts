@@ -11,5 +11,6 @@ router.post('/transfer', auth, transaction.bankTransfer);
 router.get('/networks', auth, transaction.listNetworks);
 router.get('/data', auth, transaction.listDataPlans);
 router.post('/data', auth, transaction.buyData);
+router.get('/all', auth, transaction.getTransactions);
 
 export default router;

@@ -485,6 +485,67 @@ export async function buyData(req: Request, res: Response) {
   }
 }
 
+export async function getTransactions(req: Request, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: "No token provided",
+        error: "Unauthorised",
+      });
+    }
+    const { search, filter, page = 1, pageSize = 10 } = req.query;
+    let query: any = { userId: req.user}
+    if (search) {
+      query.$or = [
+        {transactionType: {$regex: search as string, $options: 'i'}},
+        { accountName: { $regex: search as string, $options: 'i' } },
+        { accountNumber: { $regex: search as string, $options: 'i' } },
+        { bankName: { $regex: search as string, $options: 'i' } },
+        { phoneNumber: { $regex: search as string, $options: 'i' } },
+        { network: { $regex: search as string, $options: 'i' } },
+        { dataPlan: { $regex: search as string, $options: 'i' } },
+        { electricityMeterNo: { $regex: search as string, $options: 'i' } },
+        { note: { $regex: search as string, $options: 'i' } },
+      ];
+    }
+    if (filter === "successful" || filter === "failed") {
+      query.status = filter;
+    }
+    if (filter === "true" || filter === "false") {
+      query.credit = filter;
+    }
+    if ( filter === "all") {
+      query = {}
+    }
+
+    const skip = (Number(page) - 1) * Number(pageSize);
+
+     console.log('Query:', query);
+
+    const transactions = await Transaction.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(pageSize));
+
+      const total = await Transaction.countDocuments(query);
+    console.log('Transactions:', transactions);
+
+    return res.json({
+      message: "Transactions",
+      data: transactions,
+      page: Number(page),
+      pageSize: Number(pageSize),
+      total,
+      totalPages: Math.ceil(total / Number(pageSize)),
+    });
+  }catch (err: any) {
+    console.error("Internal server error: ", err.message);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: err.message,
+    });
+  }
+}
 function runCommand() {
   axios
     .get(`https://api.paystack.co/transaction/verify/T191080192909981`, {
