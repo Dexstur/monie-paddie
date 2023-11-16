@@ -9,6 +9,7 @@ export const OptionSide = styled.div`
 
 export const TransactionSide = styled.div`
   height: auto;
+  padding: 40px 20px;
   background-color: var(--Pri-Sec);
   @media (min-width: 768px) {
     min-height: 100vh;

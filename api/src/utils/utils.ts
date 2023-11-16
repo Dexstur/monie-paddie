@@ -43,20 +43,6 @@ export function verifyToken(token: string) {
   }
 }
 
-// export async function calculateBalance(userId: string) {
-//   const allTransactions = await Transaction.find({ userId });
-//   let balance = 0;
-//   if (allTransactions.length === 0) {
-//     return balance;
-//   }
-
-//   allTransactions.forEach((entry) => {
-//     entry.credit ? (balance += entry.amount) : (balance -= entry.amount);
-//   });
-
-//   return balance;
-// }
-
 export async function calculateBalance(userId: string) {
   const pipeline = [
     {
