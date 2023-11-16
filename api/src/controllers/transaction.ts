@@ -256,8 +256,24 @@ export async function searchTransactions(req: Request, res: Response) {
     }
 
     const searchQuery = req.query.search as string;
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 10;
+
+    const skip = (page - 1) * pageSize;
 
     const transactions = await Transaction.find({
+      $or: [
+        { bankName: { $regex: searchQuery, $options: 'i' } },
+        { accountNumber: { $regex: searchQuery, $options: 'i' } },
+        { accountName: { $regex: searchQuery, $options: 'i' } },
+        // Add other fields you want to search by
+      ],
+    })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(pageSize);
+
+    const total = await Transaction.countDocuments({
       $or: [
         { bankName: { $regex: searchQuery, $options: 'i' } },
         { accountNumber: { $regex: searchQuery, $options: 'i' } },
@@ -267,8 +283,11 @@ export async function searchTransactions(req: Request, res: Response) {
     });
 
     return res.json({
-      message: 'Transactions',
-      data: transactions,
+      transactions,
+      page,
+      pageSize,
+      total,
+      totalPages: Math.ceil(total / pageSize),
     });
   } catch (err: any) {
     console.error('Internal server error: ', err.message);
