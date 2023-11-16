@@ -1,17 +1,17 @@
 import { styled } from "styled-components";
-import { InputField, InputHead, Label } from "../../pages/signup/Signup.style";
+import { InputField, InputHead, Label } from "../signup/Signup.style";
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import Api from "../../api.config";
 
 const Wrapper = styled.div<{ show: boolean }>`
-  width: 316px;
-  height: auto;
+  width: 600px;
+  height: 800px;
   padding: 24px;
   position: absolute;
   z-index: 400;
   margin: 0 auto;
   top: 50%;
-  left: 50%;
+  left: 55%;
   transform: translate(-50%, -50%);
 
   right: auto;
@@ -29,12 +29,6 @@ const Wrapper = styled.div<{ show: boolean }>`
   }
 `;
 
-const Heading = styled.h5`
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 32px;
-`;
-
 const Msg = styled.p`
   font-size: 14px;
   font-weight: 500;
@@ -43,34 +37,37 @@ const Msg = styled.p`
 `;
 
 const CreateBtn = styled.button`
-  width: 120px;
+  width: 100%;
   height: 52px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
   padding: 12px 32px;
+  margin-top: 10px;
   text-align: center;
   border: none;
-  border-radius: 8px;
   background-color: var(--Pri-Color);
 `;
 
-interface CreatePinProps {
+interface Sendmoneyprops {
   display: boolean;
   dismiss: () => void;
 }
 
-function CreatePin({ display, dismiss }: CreatePinProps) {
+function Sendmoney({ display, dismiss }: Sendmoneyprops) {
   const [formData, setFormData] = useState({
-    transactionPin: "",
-    pinConfirmation: "",
+    accountNumber: "",
+    accountName: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState("");
-  const [buttonText, setButtonText] = useState("Create");
+  const [buttonText, setButtonText] = useState("Proceed");
 
   useEffect(() => {
     if (submitting) {
-      setButtonText("Creating...");
+      setButtonText("Sending...");
     } else {
-      setButtonText("Create");
+      setButtonText("Proceed");
     }
   }, [submitting]);
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
@@ -83,18 +80,18 @@ function CreatePin({ display, dismiss }: CreatePinProps) {
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!submitting) {
-      if (formData.transactionPin !== formData.pinConfirmation) {
-        setFeedback("Pin mismatch");
+      if (formData.accountNumber !== formData.accountName) {
+        setFeedback("Data mismatch");
         return;
       }
       setSubmitting(true);
       Api.put("/users/create-pin", formData)
         .then(() => {
-          setFeedback("Pin created successfully");
+          setFeedback("Account created successfully");
           setSubmitting(false);
           setFormData({
-            transactionPin: "",
-            pinConfirmation: "",
+            accountNumber: "",
+            accountName: "",
           });
           setTimeout(() => {
             setFeedback("");
@@ -102,7 +99,7 @@ function CreatePin({ display, dismiss }: CreatePinProps) {
           }, 1500);
         })
         .catch(() => {
-          setFeedback("Pin creation failed");
+          setFeedback("Account creation failed");
           setSubmitting(false);
         });
     }
@@ -111,44 +108,55 @@ function CreatePin({ display, dismiss }: CreatePinProps) {
   return (
     <Wrapper show={display}>
       <div>
-        <Heading>Create Transaction Pin</Heading>
-        <Msg>
-          Create a transaction pin to be able to make secured transaction
-        </Msg>
+        <img src="/images/transfer.svg" alt="transfer" />
+        <Msg>Enter your details to send money </Msg>
       </div>
       <form onSubmit={handleSubmit}>
-        <div className="my-3">
+        <div className="my-1">
           <InputHead>
-            <Label htmlFor="transactionPin">Create Pin</Label>
+            <Label htmlFor="bankName">Bank Name</Label>
           </InputHead>
           <InputField
-            id="transactionPin"
-            name="transactionPin"
-            placeholder="4 digit transaction pin"
-            type="password"
-            value={formData.transactionPin}
+            id="bankName"
+            name="bankName"
+            placeholder="Select Bank"
+            type="text"
+          />
+        </div>
+        <div className="my-1">
+          <InputHead>
+            <Label htmlFor="accountNumber">Account Number</Label>
+          </InputHead>
+          <InputField
+            id="accountNumber"
+            name="accountNumber"
+            placeholder="0122319063"
+            type="number"
+            value={formData.accountNumber}
             onChange={handleChange}
-            minLength={4}
-            maxLength={4}
+            minLength={10}
+            maxLength={10}
             required
           />
         </div>
-        <div className="my-3">
+
+        <div className="m-1">
           <InputHead>
-            <Label htmlFor="pinConfirmation">Confirm Pin</Label>
+            <Label htmlFor="accountName">Account Name</Label>
           </InputHead>
           <InputField
-            id="pinConfirmation"
-            name="pinConfirmation"
-            placeholder="4 digit transaction pin"
-            type="password"
-            value={formData.pinConfirmation}
+            id="accountName"
+            name="accountName"
+            placeholder="John Doe"
+            type="text"
+            value={formData.accountNumber}
             onChange={handleChange}
-            minLength={4}
-            maxLength={4}
+            minLength={12}
+            maxLength={12}
             required
           />
         </div>
+
         <CreateBtn type="submit">{buttonText}</CreateBtn>
       </form>
       <Msg>{feedback}</Msg>
@@ -156,4 +164,4 @@ function CreatePin({ display, dismiss }: CreatePinProps) {
   );
 }
 
-export default CreatePin;
+export default Sendmoney;

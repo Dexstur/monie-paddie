@@ -13,6 +13,8 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
   --Pri-Color: #00afb9;
+  --Pri-Light: #e3f1ff;
+  --Pri-Sec: #bcdbff;
 }
 
 body {

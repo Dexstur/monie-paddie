@@ -69,19 +69,27 @@ interface SidebarProps {
 
 function SideBar({ show, activeNav = "home" }: SidebarProps) {
   const navigate = useNavigate();
+
   function logout() {
     Api.post("/auth/logout").then(() => {
       navigate("/login");
     });
   }
+
   return (
     <Wrapper show={show} className="sidebar">
       <NavWrap>
-        <NavItem active={activeNav === "home"}>
+        <NavItem
+          active={activeNav === "home"}
+          onClick={() => navigate("/dashboard")}
+        >
           <AiTwotoneHome size={24} />
           <span>Home</span>
         </NavItem>
-        <NavItem active={activeNav === "payment"}>
+        <NavItem
+          active={activeNav === "payment"}
+          onClick={() => navigate("/payment")}
+        >
           <BsStack size={24} />
           <span>Payment</span>
         </NavItem>

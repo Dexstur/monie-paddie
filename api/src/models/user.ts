@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IUser extends Document {
   email: string;
-  password?: string;
+  password: string;
   fullname: string;
   bvn?: string;
   phoneNumber?: string;
@@ -11,7 +11,8 @@ export interface IUser extends Document {
   completeRegistration?: boolean;
   verifiedEmail: boolean;
   transactionPinSet?: boolean;
-  transactionPin?: string;
+  transactionPin: string;
+  balance: number;
 }
 
 const UserSchema: Schema = new Schema(
@@ -38,6 +39,7 @@ const UserSchema: Schema = new Schema(
       length: 4,
       default: '0000',
     },
+    balance: { type: Number, default: 0 },
   },
   { timestamps: true },
 );

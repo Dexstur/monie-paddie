@@ -16,28 +16,34 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #e3f1fe;
-  min-height: 100vh;
-  padding: 88px 20px 24px 20px;
+  height: 100vh;
+  overflow-y: scroll;
+  padding: 68px 0px 0px 0px;
   position: relative;
 
   @media (min-width: 768px) {
-    padding: 88px 20px 24px 260px;
+    padding: 80px 0px 0px 240px;
   }
 `;
 
 interface LayoutProps {
   children: ReactNode;
   activeNav?: "home" | "payment" | "settings";
+  history?: string[];
 }
 
-function Layout({ children, activeNav = "home" }: LayoutProps) {
+function Layout({
+  children,
+  activeNav = "home",
+  history = ["Home"],
+}: LayoutProps) {
   const [showSidebar, setShowSidebar] = useState(false);
   function toggleSidebar() {
     setShowSidebar((prev) => !prev);
   }
   return (
     <Wrapper>
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} history={history} />
       <SideBar show={showSidebar} activeNav={activeNav} />
       <Content>{children}</Content>
     </Wrapper>
