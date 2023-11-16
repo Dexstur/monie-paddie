@@ -12,10 +12,18 @@ import { calculateBalance } from '../utils/utils';
 import axios from 'axios';
 import { buyAirtimeFromBloc } from '../utils/bloc';
 import dev from '../utils/logs';
+import {
+  NetworkItem,
+  Network,
+  DataPlan,
+  DataMeta,
+  PlanReturn,
+} from '../config/types';
 
 config();
 
 const ps_secret = process.env.PAYSTACK_SECRET;
+const bloq_secret = process.env.BLOCHQ_TOKEN;
 
 /**Server logic for buy airtime */
 export async function buyAirtime(req: Request, res: Response) {
@@ -267,6 +275,207 @@ export async function bankTransfer(req: Request, res: Response) {
       message: 'Transfer successful',
       data: transfer,
     });
+  } catch (err: any) {
+    console.error('Internal server error: ', err.message);
+    return res.status(500).json({
+      message: 'Internal server error',
+      error: err.message,
+    });
+  }
+}
+
+export function listNetworks(req: Request, res: Response) {
+  try {
+    const Authorization = `Bearer ${bloq_secret}`;
+    axios
+      .get('https://api.blochq.io/v1/bills/operators?bill=telco', {
+        headers: {
+          Authorization,
+        },
+      })
+      .then((response) => {
+        const { success } = response.data;
+        if (success) {
+          const summary = response.data.data.map((item: NetworkItem) => ({
+            name: item.name,
+            id: item.id,
+          }));
+          return res.json({
+            message: 'Networks',
+            data: summary,
+          });
+        } else {
+          return res.status(502).json({
+            message: 'Networks unavailable',
+            error: 'Could not fetch networks',
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        return res.status(502).json({
+          message: 'Networks unavailable',
+          error: 'Could not fetch networks',
+        });
+      });
+  } catch (err: any) {
+    console.error('Internal server error: ', err.message);
+    return res.status(500).json({
+      message: 'Internal server error',
+      error: err.message,
+    });
+  }
+}
+
+export async function listDataPlans(req: Request, res: Response) {
+  try {
+    const { id } = req.query;
+    if (!id) {
+      return res.status(400).json({
+        message: 'Bad request',
+        error: 'Network id not provided',
+      });
+    }
+
+    const Authorization = `Bearer ${bloq_secret}`;
+
+    axios
+      .get(
+        `https://api.blochq.io/v1/bills/operators/${id}/products?bill=telco`,
+        {
+          headers: {
+            Authorization,
+          },
+        },
+      )
+      .then((response) => {
+        const { success } = response.data;
+        if (success) {
+          const plans: PlanReturn[] = [];
+          response.data.data.forEach((item: DataPlan) => {
+            if (item.fee_type === 'FIXED') {
+              const formatFee = item.meta.fee.split('.')[0];
+              item.meta.fee = formatFee;
+              plans.push({ id: item.id, meta: item.meta });
+            }
+          });
+          return res.json({
+            message: 'Data Plans',
+            data: plans,
+          });
+        } else {
+          return res.status(502).json({
+            message: 'Data Plans unavailable',
+            error: 'Could not fetch data plans',
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        return res.status(502).json({
+          message: 'Data Plans unavailable',
+          error: 'Could not fetch data plans',
+        });
+      });
+  } catch (err: any) {
+    console.error('Internal server error: ', err.message);
+    return res.status(500).json({
+      message: 'Internal server error',
+      error: err.message,
+    });
+  }
+}
+
+export async function buyData(req: Request, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: 'Unauthorised',
+        error: 'No token provided',
+      });
+    }
+
+    const user = await User.findById(req.user);
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'Transaction failed',
+        error: 'User not found',
+      });
+    }
+
+    const { network, plan, phoneNumber, pin, provider } = req.body;
+
+    if (!(network && plan && phoneNumber && pin && provider)) {
+      return res.status(400).json({
+        message: 'Bad Request',
+        error: 'Required fields not provided',
+      });
+    }
+
+    const validPin = Bcrypt.compareSync(pin, user.transactionPin);
+
+    if (!validPin) {
+      return res.status(403).json({
+        message: 'Transaction failed',
+        error: 'Invalid credentials',
+      });
+    }
+
+    const balance = await calculateBalance(req.user);
+
+    const Authorization = `Bearer ${bloq_secret}`;
+
+    axios
+      .get(
+        `https://api.blochq.io/v1/bills/operators/${network}/products?bill=telco`,
+        {
+          headers: {
+            Authorization,
+          },
+        },
+      )
+      .then((response) => {
+        const plans: DataPlan[] = response.data.data;
+        const userPlan = plans.find((data) => data.id === plan);
+        if (!userPlan) {
+          return res.status(400).json({
+            message: 'Bad request',
+            error: 'Data plan not found',
+          });
+        }
+
+        const stringAmount = userPlan.meta.fee.split('.').join('');
+        const dataCost = Number(stringAmount);
+        if (balance <= dataCost) {
+          return res.status(409).json({
+            message: 'Transaction failed',
+            error: 'Insufficient funds',
+          });
+        }
+
+        const transaction = new Transaction({
+          transactionType: 'data',
+          amount: dataCost,
+          userId: req.user,
+          credit: false,
+          bankName: provider,
+          accountName: 'Data',
+          dataPlan: plan,
+        });
+        transaction.save();
+        return res.json({
+          message: 'Purchase successful',
+          data: transaction,
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        return res.status(502).json({
+          message: 'Transaction failed',
+          error: 'Could not make data purchase',
+        });
+      });
   } catch (err: any) {
     console.error('Internal server error: ', err.message);
     return res.status(500).json({
