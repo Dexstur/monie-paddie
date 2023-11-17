@@ -33,8 +33,8 @@ function SignUpPage() {
       console.log("submitting form");
       Api.post("/auth/signup", signupData)
         .then((res) => {
-          const { message } = res.data;
-          console.log(message);
+          const { token } = res.data;
+          localStorage.setItem("token", token);
           console.log("login successful");
           setSignupData({
             email: "",
@@ -81,14 +81,14 @@ function SignUpPage() {
         .then((res) => {
           Api.post(`/auth/google/redirect`, res.data)
             .then((response) => {
-              const { message, registered } = response.data;
+              const { token, registered } = response.data;
+              localStorage.setItem("token", token);
               if (registered) {
                 navigate("/dashboard");
               } else {
                 navigate("/register");
               }
 
-              console.log(message);
               setSubmitting(false);
             })
             .catch((err) => {
