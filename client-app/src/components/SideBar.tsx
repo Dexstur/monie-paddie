@@ -72,6 +72,7 @@ function SideBar({ show, activeNav = "home" }: SidebarProps) {
 
   function logout() {
     Api.post("/auth/logout").then(() => {
+      localStorage.removeItem("token");
       navigate("/login");
     });
   }
