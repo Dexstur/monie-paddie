@@ -41,14 +41,14 @@ function LoginPage() {
         .then((res) => {
           Api.post(`/auth/google/redirect`, res.data)
             .then((response) => {
-              const { message, registered } = response.data;
-              console.log(registered);
+              const { token, registered } = response.data;
+              localStorage.setItem("token", token);
               if (registered) {
                 navigate("/dashboard");
               } else {
                 navigate("/register");
               }
-              console.log(message);
+
               setSubmitting(false);
             })
             .catch((err) => {
@@ -83,9 +83,8 @@ function LoginPage() {
       console.log("submitting form");
       Api.post("/auth/login", loginData)
         .then((res) => {
-          const { message } = res.data;
-          console.log(message);
-          console.log("login successful");
+          const { token } = res.data;
+          localStorage.setItem("token", token);
           setLoginData({ email: "", password: "" });
           setSubmitting(false);
           navigate("/dashboard");
