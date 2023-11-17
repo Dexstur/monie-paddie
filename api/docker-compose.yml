@@ -1,0 +1,9 @@
+version: '3'
+services:
+  moniepaddy16api:
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: dexstur/moniepaddy16api:latest
+    ports:
+      - '5500:5500'
