@@ -7,6 +7,7 @@ const Wrapper = styled.div`
   padding: 24px;
   gap: 24px;
   height: 186px;
+  width: 312px;
   background-color: #fff;
 `;
 
@@ -25,7 +26,7 @@ const Top = styled.div`
 const Text = styled.span`
   font-size: 16px;
   font-weight: 400;
-  min-width: 280px;
+  width: 220px;
 `;
 const Amount = styled.h2`
   font-size: 32px;
