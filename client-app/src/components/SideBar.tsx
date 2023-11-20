@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 const Wrapper = styled.div<{ show: boolean }>`
   width: 180px;
   height: 100vh;
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   display: ${({ show }) => (show ? "block" : "none")};
