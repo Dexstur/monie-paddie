@@ -548,6 +548,47 @@ export async function getTransactions(req: Request, res: Response) {
   }
 }
 
+export async function getTransferDetails(req: Request, res: Response) {
+  try {
+    const { id = '' } = req.query;
+    if (!id) {
+      return res.status(400).json({
+        message: 'Bad request',
+        error: 'Transaction id not provided',
+      });
+    }
+    if (!req.user) {
+      return res.status(401).json({
+        message: 'Unauthorised',
+        error: 'No token provided',
+      });
+    }
+
+    const transaction = await Transaction.findOne({
+      _id: id,
+      userId: req.user,
+      transactionType: 'transfer',
+    });
+    if (!transaction) {
+      return res.status(404).json({
+        message: 'Transaction not found',
+        error: 'Transaction not found',
+      });
+    }
+
+    return res.json({
+      message: 'Transaction details',
+      data: transaction,
+    });
+  } catch (err: any) {
+    console.error('Internal server error: ', err.message);
+    return res.status(500).json({
+      message: 'Internal server error',
+      error: err.message,
+    });
+  }
+}
+
 async function action() {
   const dataTransactions = await Transaction.find({
     transactionType: 'data',

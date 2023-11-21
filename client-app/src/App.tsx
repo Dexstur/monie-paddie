@@ -11,6 +11,7 @@ import Home from "./pages/bars/Home";
 import PaymentPage from "./pages/payment/Payment";
 import Settings from "./pages/bars/Settings";
 import BankTransfer from "./pages/sendMoney/BankTransfer";
+import QuickTransfer from "./pages/quickTransfer/quickTransfer";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<MockDashboard />} />
         <Route path="/send-money" element={<BankTransfer />} />
+        <Route path="/quick-transfer" element={<QuickTransfer />} />
         <Route path="/buy-airtime" element={<BuyAirtimedash />} />
         <Route path="/buy-data" element={<BuyDataPage />} />
         <Route path="/register" element={<Register />} />
