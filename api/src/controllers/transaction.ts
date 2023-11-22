@@ -521,15 +521,12 @@ export async function getTransactions(req: Request, res: Response) {
 
     const skip = (Number(page) - 1) * Number(pageSize);
 
-    // console.log('Query:', query);
-
     const transactions = await Transaction.find(query)
       .sort({ createdAt: sort })
       .skip(skip)
       .limit(Number(pageSize));
 
     const total = await Transaction.countDocuments(query);
-    // console.log('Transactions:', transactions);
 
     return res.json({
       message: 'Transactions',
