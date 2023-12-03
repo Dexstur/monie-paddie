@@ -5,6 +5,8 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import session from 'express-session';
+import fileupload from 'express-fileupload';
+import { v2 as cloudinary } from 'cloudinary';
 
 import indexRouter from './routes/index';
 import usersRouter from './routes/users';
@@ -25,11 +27,25 @@ const clientUrl =
     ? process.env.CLIENT_URL_DEV
     : process.env.CLIENT_URL;
 
+const cloud_name = process.env.CLOUD_NAME || '';
+const api_key = process.env.CLOUD_KEY || '';
+const api_secret = process.env.CLOUD_SECRET || '';
+
+cloudinary.config({
+  cloud_name,
+  api_key,
+  api_secret,
+});
 app.use(
   cors({
     origin: clientUrl,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
+  }),
+);
+app.use(
+  fileupload({
+    useTempFiles: true,
   }),
 );
 

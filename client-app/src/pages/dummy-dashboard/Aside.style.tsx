@@ -1,5 +1,18 @@
 import { styled } from "styled-components";
 
+export const Cover = styled.div`
+  padding: 24px;
+  position: relative;
+`;
+export const Abs = styled.div`
+  width: 90%;
+  position: absolute;
+`;
+export const Clearance = styled.div`
+  width: 100%;
+  height: 84px;
+`;
+
 export const SearchBar = styled.div`
   display: flex;
   justify-content: space-between;
