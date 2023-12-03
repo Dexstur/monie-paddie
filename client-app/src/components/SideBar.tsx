@@ -94,7 +94,10 @@ function SideBar({ show, activeNav = "home" }: SidebarProps) {
           <BsStack size={24} />
           <span>Payment</span>
         </NavItem>
-        <NavItem active={activeNav === "settings"}>
+        <NavItem
+          active={activeNav === "settings"}
+          onClick={() => navigate("/settings")}
+        >
           <AiFillSetting size={24} />
           <span>Settings</span>
         </NavItem>

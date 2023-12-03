@@ -50,9 +50,11 @@ function PaymentPage() {
             </Top>
             <div style={{ height: "70px" }}>
               <OptionText>
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s
+                Send money quickly and securely to anyone, anywhere. Whether
+                it's sending a gift, or you're short on cash and need to settle
+                an expense, our seamless online transfer service makes it easy.
+                Experience the convenience of instant money transfers with just
+                a few clicks.
               </OptionText>
             </div>
           </Option>
@@ -63,8 +65,10 @@ function PaymentPage() {
             </Top>
             <div style={{ height: "70px" }}>
               <OptionText>
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's
+                Stay connected effortlessly by topping up your mobile airtime
+                with our convenient service. Purchase airtime for your phone or
+                for loved ones just enter the network and phone number. Enjoy
+                seamless communication and never run out of talk time.
               </OptionText>
             </div>
           </Option>
@@ -75,8 +79,10 @@ function PaymentPage() {
             </Top>
             <div style={{ height: "70px" }}>
               <OptionText>
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the
+                Enhance your online experience by easily purchasing mobile data
+                for internet browsing. Stay connected, stream content, and
+                browse your favorite websites with our hassle-free data buying
+                service.
               </OptionText>
             </div>
           </Option>
@@ -87,8 +93,10 @@ function PaymentPage() {
             </Top>
             <div style={{ height: "70px" }}>
               <OptionText>
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
+                Simplify your life by easily paying your electricity bills
+                online. Skip the queues and avoid the hassle of traditional
+                payment methods. Experience the convenience of secure and swift
+                electricity bill payments.
               </OptionText>
             </div>
           </Option>

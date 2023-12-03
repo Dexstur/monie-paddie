@@ -13,6 +13,7 @@ import { CardDetails, UserDetails, Wrapper, Text } from "./CardDetails.style";
 import FrequentTransfers from "./FrequentTransactions.style";
 import Referrals from "./Referral.style";
 import ListTransactions from "./Aside";
+import { useNavigate } from "react-router-dom";
 
 function MockDashboard() {
   const [data, setData] = useState(null);
@@ -26,6 +27,7 @@ function MockDashboard() {
   const [successMessage, setSuccessMessage] = useState("");
   const [newFund, setNewFund] = useState(false);
 
+  const navigate = useNavigate();
   function fundSuccess() {
     setSuccessTitle(`Congratulations ${username}`);
     setSuccessMessage("You have successfully funded your wallet");
@@ -117,6 +119,11 @@ function MockDashboard() {
   }
 
   if (errorMessage) {
+    if (errorMessage === "Unauthorized") {
+      setTimeout(() => {
+        navigate("/login");
+      }, 1200);
+    }
     return <ErrorPage message={errorMessage} />;
   }
 

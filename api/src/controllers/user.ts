@@ -7,29 +7,6 @@ import Bcrypt from 'bcryptjs';
 
 export async function login(req: Request, res: Response) {
   try {
-    // if (req.url.startsWith('/google/redirect?code=')) {
-    //   // login with google
-
-    //   dev.log(req.user);
-    //   const token = generateToken(req.user, res);
-    //   const clientUrl =
-    //     process.env.NODE_ENV === 'development'
-    //       ? process.env.CLIENT_URL_DEV
-    //       : process.env.CLIENT_URL;
-    //   return res.redirect(`${clientUrl}/sso?token=${token}`);
-    // }
-    // manual login goes here
-
-    // Validate user inputs
-    // const validate = loginSchema.validate(req.body, options);
-    // if (validate.error) {
-    //   const message = validate.error.details.map((detail) => detail.message).join(',');
-    //   return res.status(400).json({
-    //     status: 'fail',
-    //     message,
-    //   });
-    // }
-
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -57,7 +34,7 @@ export async function login(req: Request, res: Response) {
     // Check if the password is correct and log in user
     const validUser = Bcrypt.compareSync(password, user.password);
     if (!validUser) {
-      return res.status(400).json({
+      return res.status(401).json({
         message: 'Invalid credentials',
         error: 'Invalid credentials',
       });
@@ -88,7 +65,10 @@ export async function signup(req: Request, res: Response) {
     const salt = 10;
 
     if (!fullname || !email || !phoneNumber || !bvn || !password) {
-      return res.status(400).send('All fields are required');
+      return res.status(400).json({
+        message: 'Signup failed',
+        error: 'All fields are required',
+      });
     }
 
     const existingUser = await User.findOne({ email });
@@ -138,7 +118,7 @@ export async function createPin(req: Request, res: Response) {
 
     if (transactionPin.length !== 4 || !/^\d+$/.test(transactionPin)) {
       return res.status(400).json({
-        message: 'Please use only digits',
+        message: 'Please use only digits (must be 4 digits long)',
         error: 'Invalid transaction pin',
       });
     }
@@ -285,16 +265,82 @@ export async function dashboard(req: Request, res: Response) {
   }
 }
 
+export async function updateUser(req: Request, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: 'Unauthorized',
+        error: 'No token provided',
+      });
+    }
+    const user = await User.findById(req.user);
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found',
+        error: 'User not found',
+      });
+    }
+
+    const { picture } = req.body;
+    if (!picture) {
+      return res.status(400).json({
+        message: 'Please upload a picture',
+        error: 'Bad request',
+      });
+    }
+
+    user.picture = picture;
+    await user.save();
+
+    return res.json({
+      message: 'User updated',
+      data: user,
+    });
+  } catch (err: any) {
+    console.error(err.message);
+    res.status(500).json({
+      message: 'Internal server error',
+      error: err.message,
+    });
+  }
+}
+
+export async function profilePicture(req: Request, res: Response) {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: 'Unauthorized',
+        error: 'No token provided',
+      });
+    }
+
+    const user = await User.findById(req.user);
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found',
+        error: 'Not found',
+      });
+    }
+
+    return res.json({
+      message: 'User picture',
+      data: user.picture,
+    });
+  } catch (err: any) {
+    console.error(err.message);
+    res.status(500).json({
+      message: 'Internal server error',
+      error: err.message,
+    });
+  }
+}
+
 async function usersSetup() {
   const allUsers = await User.find();
   allUsers.forEach(async (user) => {
-    if (user.bvn) {
-      user.completeRegistration = true;
-      await user.save();
-    } else {
-      user.completeRegistration = false;
-      await user.save();
-    }
+    user.picture =
+      'https://res.cloudinary.com/dzdvous3v/image/upload/v1701630791/moniepaddy/6544f1ced8e5feb4b004943a-pic3-1701630771000.jpg';
+    await user.save();
   });
 }
 
