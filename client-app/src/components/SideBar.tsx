@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 const Wrapper = styled.div<{ show: boolean }>`
   width: 180px;
   height: 100vh;
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   display: ${({ show }) => (show ? "block" : "none")};
@@ -72,6 +72,7 @@ function SideBar({ show, activeNav = "home" }: SidebarProps) {
 
   function logout() {
     Api.post("/auth/logout").then(() => {
+      localStorage.removeItem("token");
       navigate("/login");
     });
   }

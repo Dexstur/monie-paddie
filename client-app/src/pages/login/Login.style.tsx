@@ -7,11 +7,13 @@ export const Wrapper = styled.div`
 export const SignupSide = styled.div`
   background-color: #fff;
   padding: 40px 64px;
-  max-height: 100vh;
-  overflow-y: scroll;
+  height: auto;
+  min-height: 100vh;
+  overflow-y: visible;
 
   @media (min-width: 768px) {
-    min-height: 100vh;
+    height: 100vh;
+    overflow-y: scroll;
   }
 `;
 

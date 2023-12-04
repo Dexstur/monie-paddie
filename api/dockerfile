@@ -1,0 +1,23 @@
+FROM node:alpine
+
+ENV NODE_ENV=production
+
+ENV PORT=5500
+
+ENV CLIENT_URL=https://monie-paddy.onrender.com
+
+WORKDIR /app
+
+COPY package.json yarn.lock /app/
+
+RUN yarn
+
+COPY . /app/
+
+RUN yarn
+
+RUN yarn tsc
+
+EXPOSE 5500
+
+CMD ["yarn", "start"]

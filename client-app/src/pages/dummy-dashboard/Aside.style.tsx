@@ -26,6 +26,8 @@ export const SearchField = styled.input`
   font-size: 16px;
   font-weight: 400;
   width: 100%;
+  background-color: #fff;
+  color: #000;
 
   &:focus {
     border: none;

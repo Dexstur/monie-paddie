@@ -1,4 +1,7 @@
 import styled from "styled-components";
+import Api from "../../api.config";
+import { useEffect, useState } from "react";
+import { TransactionItem } from "../dummy-dashboard/TransactionList";
 
 const Text = styled.p`
   font-size: 12px;
@@ -7,13 +10,24 @@ const Text = styled.p`
   text-align: center;
 `;
 
+const LinkWrap = styled.a`
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const ItemWrapper = styled.div`
+  display: flex;
+  justify-center: center;
+  flex-direction: column;
+  gap: 12px;
+`;
+
 const Initials = styled.p`
   font-size: 32px;
   font-weight: 600;
   color: #00afb9;
-  padding: 24px;
-  background-color: #fff;
-  border-radius: 8px;
 `;
 
 const QuickTransfer = styled.div`
@@ -24,52 +38,68 @@ const QuickTransfer = styled.div`
   padding-top: 0;
   gap: 40px;
   flex-wrap: wrap;
-  justify-content: space-between;
 
   @media (min-width: 768px) {
+    gap: 40px;
     flex-direction: row;
-    gap: 10px;
   }
 `;
 
 const Box = styled.div`
-  width: 100%;
+  width: 96px;
   height: 96px;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 8px;
+  text-align: center;
+  margin: 0 auto;
 `;
 
 export default function FrequentTransfers() {
+  const [list, setList] = useState<TransactionItem[]>([]);
+  useEffect(() => {
+    Api.get(`/transactions/all?search=transfer&filter=newest`).then((res) => {
+      const fullList = res.data.data;
+      console.log(fullList);
+      const uniqueNames = [
+        ...new Set(fullList.map((item: TransactionItem) => item.accountName)),
+      ];
+      const uniqueList: TransactionItem[] = [];
+      uniqueNames.forEach((name) => {
+        const filtered = fullList.filter(
+          (item: TransactionItem) => item.accountName === name
+        );
+        uniqueList.push(filtered[0]);
+      });
+      setList(uniqueList.slice(0, 5));
+      console.log(uniqueList);
+    });
+  }, []);
+
+  function getInitials(name: string) {
+    const initials = name
+      .split(" ")
+      .map((item, index) => {
+        if (index < 2) {
+          return item[0];
+        }
+      })
+      .join("");
+    return initials;
+  }
   return (
-    <QuickTransfer className="col-12 col-lg-2 col-sm-6">
-      <div>
-        <Box>
-          <Initials>PM</Initials>
-        </Box>
-        <Text>Peter Michael</Text>
-      </div>
-      <div>
-        <Box>
-          <Initials>CB</Initials>
-        </Box>
-        <Text>Chinonso Benson</Text>
-      </div>
-      <div>
-        <Box>
-          <Initials>TP</Initials>
-        </Box>
-        <Text>Tochii Praise</Text>
-      </div>
-      <div>
-        <Box>
-          <Initials>CC</Initials>
-        </Box>
-        <Text>Chinedu Chuks</Text>
-      </div>
-      <div>
-        <Box>
-          <Initials>FC</Initials>
-        </Box>
-        <Text>Freedom Clinton</Text>
-      </div>
+    <QuickTransfer>
+      {list.length === 0 && <p>No recent transfers</p>}
+      {list.map((item) => (
+        <ItemWrapper key={item._id}>
+          <LinkWrap href={`/quick-transfer?id=${item._id}`}>
+            <Box>
+              <Initials>{getInitials(item.accountName)}</Initials>
+            </Box>
+            <Text>{item.accountName.split(" ").slice(0, 2).join(" ")}</Text>
+          </LinkWrap>
+        </ItemWrapper>
+      ))}
     </QuickTransfer>
   );
 }
