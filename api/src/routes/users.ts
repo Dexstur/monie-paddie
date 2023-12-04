@@ -3,8 +3,11 @@ import {
   createPin,
   dashboard,
   completeRegistration,
+  updateUser,
+  profilePicture,
 } from '../controllers/user';
 import { auth } from '../middleware/auth';
+import { picUpload } from '../middleware/pic';
 const router = express.Router();
 
 /* GET users listing. */
@@ -20,5 +23,9 @@ router.get('/dashboard', auth, dashboard);
 router.post('/register', auth, completeRegistration);
 
 router.put('/create-pin', auth, createPin);
+
+router.put('/', [auth, picUpload], updateUser);
+
+router.get('/picture', auth, profilePicture);
 
 export default router;

@@ -27,6 +27,7 @@ export interface TransactionItem {
   status?: string;
   createdAt: Date;
   updatedAt: Date;
+  _id: string;
 }
 
 interface TransactionListProps {

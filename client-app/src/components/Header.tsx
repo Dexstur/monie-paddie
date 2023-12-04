@@ -1,7 +1,10 @@
 import { styled } from "styled-components";
 import { HiBell } from "react-icons/hi";
 import { FaBars } from "react-icons/fa";
+import { useState, useEffect } from "react";
 import pic3 from "../assets/pic3.jpg";
+import Api from "../api.config";
+import { useNavigate } from "react-router-dom";
 
 const TopBar = styled.header`
   width: 100%;
@@ -95,6 +98,7 @@ const ProfilePic = styled.img`
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  cursor: pointer;
 `;
 
 // const SuccessButton = styled.button`
@@ -107,7 +111,17 @@ interface HeaderProps {
 }
 
 function Header({ toggleSidebar, history = ["Home"] }: HeaderProps) {
+  const [pic, setPic] = useState(pic3);
+  useEffect(() => {
+    Api.get("/users/picture").then((res) => {
+      console.log("called");
+      const picture = res.data.data;
+      setPic(picture);
+    });
+  }, []);
+
   const lastIndex = history.length - 1;
+  const navigate = useNavigate();
   return (
     <TopBar>
       <TopSection
@@ -136,7 +150,11 @@ function Header({ toggleSidebar, history = ["Home"] }: HeaderProps) {
           <HiBell size={24} color={"#00afb9"} />
         </BellWrap>
         <span className="mx-2">
-          <ProfilePic src={pic3} alt="profile picture" />
+          <ProfilePic
+            src={pic}
+            alt="profile picture"
+            onClick={() => navigate("/settings")}
+          />
         </span>
       </TopSection>
     </TopBar>

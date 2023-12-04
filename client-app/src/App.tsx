@@ -11,6 +11,10 @@ import Home from "./pages/bars/Home";
 import PaymentPage from "./pages/payment/Payment";
 import Settings from "./pages/bars/Settings";
 import BankTransfer from "./pages/sendMoney/BankTransfer";
+import QuickTransfer from "./pages/quickTransfer/quickTransfer";
+import SettingsPage from "./pages/settings/Settings";
+import ChangePinPage from "./pages/changePin/ChangePin";
+import ErrorPage from "./pages/screens/Error";
 
 function App() {
   return (
@@ -21,12 +25,16 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<MockDashboard />} />
         <Route path="/send-money" element={<BankTransfer />} />
+        <Route path="/quick-transfer" element={<QuickTransfer />} />
         <Route path="/buy-airtime" element={<BuyAirtimedash />} />
         <Route path="/buy-data" element={<BuyDataPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/sidebar/home" element={<Home />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/sidebar/settings" element={<Settings />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/change-pin" element={<ChangePinPage />} />
+        <Route path="*" element={<ErrorPage message="Page not found" />} />
       </Routes>
     </BrowserRouter>
   );
