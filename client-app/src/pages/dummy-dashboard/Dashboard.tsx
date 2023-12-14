@@ -96,7 +96,7 @@ function MockDashboard() {
                   className="mt-4 mx-4"
                   style={{ width: "40px", height: "24px" }}
                 />
-                <UserDetails>GIFT CHUKS</UserDetails>
+                <UserDetails>{username.toUpperCase()}</UserDetails>
                 <CardDetails>***6580</CardDetails>
               </div>
             </MoneyDetail>
