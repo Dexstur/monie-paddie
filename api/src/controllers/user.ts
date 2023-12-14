@@ -86,6 +86,8 @@ export async function signup(req: Request, res: Response) {
       phoneNumber,
       bvn: hashedBvn,
       password: hashedPassword,
+      picture:
+        'https://res.cloudinary.com/dzdvous3v/image/upload/v1701630791/moniepaddy/6544f1ced8e5feb4b004943a-pic3-1701630771000.jpg',
       completeRegistration: true,
     });
 
@@ -161,6 +163,8 @@ export async function googleSignOn(req: Request, res: Response) {
         fullname: name,
         ssoId: id,
         ssoProvider: 'Google',
+        picture:
+          'https://res.cloudinary.com/dzdvous3v/image/upload/v1701630791/moniepaddy/6544f1ced8e5feb4b004943a-pic3-1701630771000.jpg',
         verifiedEmail: true,
       });
 
