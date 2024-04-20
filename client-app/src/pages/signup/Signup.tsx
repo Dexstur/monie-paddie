@@ -17,7 +17,7 @@ import {
   Text,
 } from "./Signup.style";
 import googleLogo from "/google-logo.png";
-import { FormEvent, useState, ChangeEvent } from "react";
+import { FormEvent, useState, ChangeEvent, useEffect } from "react";
 import Api from "../../api.config";
 import axios from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -26,6 +26,10 @@ import { useNavigate } from "react-router-dom";
 
 function SignUpPage() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    Api.get("/");
+  }, []);
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!submitting) {
@@ -136,112 +140,112 @@ function SignUpPage() {
   }
   return (
     <Wrapper>
-      <div className="row">
-        <SignupSide className="col col-12 col-lg-5">
+      <div className='row'>
+        <SignupSide className='col col-12 col-lg-5'>
           <StylishText>Monie Paddy</StylishText>
-          <RegisterBox className="my-4">
+          <RegisterBox className='my-4'>
             <h2 style={{ fontSize: "32px" }}>Sign Up</h2>
             <p style={{ fontSize: "16px" }}>
               Create an account to enjoy our benefits
             </p>
           </RegisterBox>
           <GoogleSignin href={`#`} onClick={() => googlePassport()}>
-            <GooglesLogo src={googleLogo} alt="google logo" />
+            <GooglesLogo src={googleLogo} alt='google logo' />
             Sign up with Google
           </GoogleSignin>
-          <Strikethrough className="my-4">
+          <Strikethrough className='my-4'>
             <Strike />
             <Or>Or</Or>
             <Strike />
           </Strikethrough>
           <form onSubmit={handleSubmit}>
-            <div className="my-3">
+            <div className='my-3'>
               <InputHead>
-                <Label htmlFor="fullname">Full Name</Label>
+                <Label htmlFor='fullname'>Full Name</Label>
               </InputHead>
               <InputField
-                id="fullname"
-                placeholder="John Doe"
-                type="text"
-                name="fullname"
+                id='fullname'
+                placeholder='John Doe'
+                type='text'
+                name='fullname'
                 onChange={handleChange}
                 value={signupData.fullname}
                 required
               />
             </div>
-            <div className="my-3">
+            <div className='my-3'>
               <InputHead>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor='email'>Email</Label>
               </InputHead>
               <InputField
-                id="email"
-                placeholder="name@example.com"
-                type="email"
-                name="email"
+                id='email'
+                placeholder='name@example.com'
+                type='email'
+                name='email'
                 onChange={handleChange}
                 value={signupData.email}
                 required
               />
             </div>
-            <div className="my-3">
+            <div className='my-3'>
               <InputHead>
-                <Label htmlFor="phoneNumber">Phone Number</Label>
+                <Label htmlFor='phoneNumber'>Phone Number</Label>
               </InputHead>
               <InputField
-                id="phoneNumber"
-                placeholder="0812345678"
-                type="tel"
-                name="phoneNumber"
+                id='phoneNumber'
+                placeholder='0812345678'
+                type='tel'
+                name='phoneNumber'
                 onChange={handleChange}
                 value={signupData.phoneNumber}
                 required
               />
             </div>
-            <div className="my-3">
+            <div className='my-3'>
               <InputHead>
-                <Label htmlFor="bvn">Bvn</Label>
+                <Label htmlFor='bvn'>Bvn</Label>
               </InputHead>
               <InputField
-                id="bvn"
-                placeholder="22516146577"
-                type="number"
-                name="bvn"
+                id='bvn'
+                placeholder='22516146577'
+                type='number'
+                name='bvn'
                 onChange={handleChange}
                 value={signupData.bvn}
                 required
               />
             </div>
-            <div className="my-3">
+            <div className='my-3'>
               <InputHead>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor='password'>Password</Label>
               </InputHead>
               <InputField
-                id="password"
-                placeholder="Password123@"
-                type="password"
+                id='password'
+                placeholder='Password123@'
+                type='password'
                 onChange={handleChange}
                 value={signupData.password}
-                name="password"
+                name='password'
                 required
               />
             </div>
-            <div className="mt-5">
-              <SubmitForm type="submit">Sign Up</SubmitForm>
+            <div className='mt-5'>
+              <SubmitForm type='submit'>Sign Up</SubmitForm>
             </div>
           </form>
-          <div className="d-flex" style={{ gap: "8px" }}>
+          <div className='d-flex' style={{ gap: "8px" }}>
             <p>Already a member?</p>
-            <ExtLink href="/login">Sign In</ExtLink>
+            <ExtLink href='/login'>Sign In</ExtLink>
           </div>
         </SignupSide>
-        <FounderSide className="col col-12 col-lg-7">
+        <FounderSide className='col col-12 col-lg-7'>
           {/* <p>Founder message here</p> */}
           <Text>
             It takes 20 years to build a reputation and five minutes to ruin it.
             If you think about that, you’ll do things differently.
           </Text>
-          <strong className="py-7 px-4"> - Boluwatife</strong>
-          <p className="p-4"> Founder, Pay-buddy</p>
+          <strong className='py-7 px-4'> - Boluwatife</strong>
+          <p className='p-4'> Founder, Pay-buddy</p>
         </FounderSide>
       </div>
     </Wrapper>
