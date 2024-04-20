@@ -2,6 +2,8 @@ import { styled } from "styled-components";
 import landingImage from "/landing.jpeg";
 import { useNavigate } from "react-router-dom";
 import { StylishText } from "../signup/Signup.style";
+import { useEffect } from "react";
+import Api from "../../api.config";
 
 const Navbar = styled.div`
   width: 100%;
@@ -106,6 +108,9 @@ const Button = styled.button`
 
 function MockPage() {
   const navigate = useNavigate();
+  useEffect(() => {
+    Api.get("/");
+  }, []);
   return (
     <Container>
       <Navbar>
@@ -126,7 +131,7 @@ function MockPage() {
           <Button onClick={() => navigate("/login")}>Get Started</Button>
         </WriteUp>
         <ImgCont>
-          <RoundedImage src={landingImage} alt="load img" />
+          <RoundedImage src={landingImage} alt='load img' />
         </ImgCont>
       </Wrap>
     </Container>
